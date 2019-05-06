@@ -1,15 +1,28 @@
 {
   "name": "gverse",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Object Graph Mapper for Dgraph",
-  "main": "build/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "Zak Mandhro <zak.mandhro@gmail.com>",
+  "keywords": [
+    "graph-database",
+    "dgraph",
+    "typescript",
+    "orm",
+    "ogm",
+    "javascript",
+    "database",
+    "graphql"
+  ],
+  "repository": "gverse/gverse",
   "license": "MIT",
   "scripts": {
     "build": "npx tsc",
     "test": "npx jest",
     "integration": "npx jest -i -c jest.integration.config.js",
-    "test-watch": "npx jest --watch"
+    "test-watch": "npx jest --watch",
+    "publish": "npx tsc && npm publish"
   },
   "devDependencies": {
     "@types/debug": "^4.1.2",

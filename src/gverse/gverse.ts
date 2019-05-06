@@ -1,4 +1,4 @@
-import chalk from "chalk" // todo: find typescript equivalent
+import chalk from "chalk"
 import debug from "debug"
 import * as dgraph from "dgraph-js"
 import * as grpc from "grpc"

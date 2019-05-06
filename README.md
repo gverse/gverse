@@ -10,11 +10,11 @@ An OGM enables developers to work with their graph models through idiomatic obje
 
 Here's a quick start guide to get you up and running.
 
-##### Install Dgraph
+#### Install Dgraph
 
 Make sure you [Dgraph installed and running](https://docs.dgraph.io/get-started). This guide assumes you have Dgraph running on default port (9080).
 
-##### Install Gverse package
+#### Install Gverse package
 
 ```sh
 npm install gverse
@@ -22,7 +22,7 @@ npm install gverse
 
 or if you prefer, `yarn add gverse`. The package includes TypeScript types.
 
-##### Create a Gverse graph object
+#### Create a Gverse graph object
 
 ```typescript
 import Gverse from "gverse"
@@ -32,7 +32,7 @@ const graph = new Gverse.Graph(
 )
 ```
 
-##### Define a vertex class
+#### Define a vertex class
 
 ```typescript
 class Person extends Gverse.Vertex {
@@ -41,7 +41,7 @@ class Person extends Gverse.Vertex {
 }
 ```
 
-##### Persist and load a vertex instance
+#### Create the vertex on the grpah
 
 ```typescript
 const person = new Person()
@@ -50,7 +50,7 @@ person.name = "Zak"
 const uid = await graph.create(person)
 ```
 
-##### Load a vertex from the graph
+#### Load a vertex from the graph
 
 ```typescript
 const zak = (await graph.get(uid)) as Person
@@ -67,10 +67,10 @@ To run the unit tests (under development):
 npm run test
 ```
 
-For integration tests, start the local dgraph first and then run the tests:
+For integration tests, start the local Dgraph first and then run the tests:
 
 ```sh
-./scripts/test_dgraph.sh
+./scripts/test_dgraph.sh # start Dgraph
 npm run integration
 ```
 
