@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "build": "npx tsc",
-    "test": "npx jest -i",
+    "test": "npx jest",
     "integration": "npx jest -i -c jest.integration.config.js",
     "test-watch": "npx jest --watch"
   },
