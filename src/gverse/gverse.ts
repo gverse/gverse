@@ -18,7 +18,6 @@ process.on("unhandledRejection", (reason, p) => {
 })
 
 namespace Gverse {
-  const DEBUG_MODE: boolean = true
   const DEFAULT_SCHEMA = "<type>: string @index(exact) ."
 
   export interface Environment {

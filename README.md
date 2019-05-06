@@ -14,6 +14,16 @@ Here's a quick start guide to get you up and running.
 
 Make sure you [Dgraph installed and running](https://docs.dgraph.io/get-started). This guide assumes you have Dgraph running on default port (9080).
 
+#### Set up your ES6 or TypeScript environment
+
+Gverse requires ES6 with class properties plugin or TypeScript ≥ 2.0. TypeScript 3.4 or higher is recommended.
+
+- Configure [Babel](https://babel.org) (see [quick start guide](https://www.robinwieruch.de/minimal-node-js-babel-setup/)) and add the [Class Properties Plugin](https://babeljs.io/docs/en/babel-plugin-proposal-class-properties)
+
+or
+
+- Use [TypeScript](https://www.typescriptlang.org/docs/tutorial.html) (see [getting started guide](https://levelup.gitconnected.com/typescript-quick-start-guide-7257c2b71538))
+
 #### Install Gverse package
 
 ```sh
@@ -28,7 +38,7 @@ or if you prefer, `yarn add gverse`. The package includes TypeScript types.
 import Gverse from "gverse"
 
 const graph = new Gverse.Graph(
-  new Gverse.Connection({ host: "localhost", port: 9999 })
+  new Gverse.Connection({ host: "localhost", port: 9080 })
 )
 ```
 
