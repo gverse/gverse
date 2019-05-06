@@ -12,7 +12,7 @@ Here's a quick start guide to get you up and running.
 
 #### Install Dgraph
 
-Make sure you [Dgraph installed and running](https://docs.dgraph.io/get-started). This guide assumes you have Dgraph running on default port (9080).
+Make sure you have [Dgraph installed and running](https://docs.dgraph.io/get-started). This guide assumes you have Dgraph running on default port (9080).
 
 #### Set up your ES6 or TypeScript environment
 
@@ -42,7 +42,7 @@ const graph = new Gverse.Graph(
 )
 ```
 
-#### Define a vertex class
+#### Define a Gverse.Vertex class
 
 ```typescript
 class Person extends Gverse.Vertex {
@@ -51,7 +51,7 @@ class Person extends Gverse.Vertex {
 }
 ```
 
-#### Create the vertex on the grpah
+#### Create the vertex on the graph
 
 ```typescript
 const person = new Person()
@@ -84,11 +84,29 @@ For integration tests, start the local Dgraph first and then run the tests:
 npm run integration
 ```
 
+#### Gverse features
+
+Supported now:
+
+- Simple API for working with graphs
+- Strongly typed classes and predicates (instance variables) when using TypeScript
+- Automatically marshal and unmarshal JavaScript objects to and from Graph vertices
+- Support for custom marshaling and unmarshaling methods
+- Support for directed and undirected edges
+- Support for transactions and batch updates
+- Before and after hooks for create, update and delete operations
+
+Roadmap:
+
+- Decorators for object-to-graph mapping
+- Query options
+- Immutable vertex instances
+
 #### Gverse vs Traditional ORMs
 
 Gverse has some fundamental differences to popular ORMs. It's helpful to understand the key differences to avoid confusion:
 
 - Gverse works with vertices and edges in a Graph structure instead of tables, columns and rows in RDBMS like MySQL, Postgres, Oracle, or documents in MongoDB, CouchDB, etc. ([learn more](https://docs.dgraph.io/query-language/)).
-- Gverse schema supports dynamic typing. New predicates (attributes can be added dynamically and the data types are inferred. You do not need to define and migrate schemas.
+- Gverse schema supports dynamic typing. You do not need to define and migrate schemas. Predicates (attributes) can be added as needed, with their data types inferred by value.
 - A schema definition is required for any type that is part of a [query or filter function](https://docs.dgraph.io/query-language/#schema). Both the type and the index needs to be defined and applied. .
 - Advanced graph queries in Gverse are written using GraphQL± (a variant of [GraphQL](graphql.org)).
