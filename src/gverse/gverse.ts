@@ -411,7 +411,9 @@ namespace Gverse {
       log("Graph.queryWithFunction", vertexClass.name, queryFunction)
       return await this.query(
         vertexClass,
-        `{vertices(func:${queryFunction}) { ${Graph.expansion(depth)} }}`,
+        `{vertices(func:${queryFunction}) @filter(eq(type, ${
+          vertexClass.name
+        })) { ${Graph.expansion(depth)} }}`,
         {},
         transaction,
         depth
