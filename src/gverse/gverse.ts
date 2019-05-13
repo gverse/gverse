@@ -849,7 +849,7 @@ namespace Gverse {
     }
 
     /** Property is true when product has a Dgraph UID. */
-    get exists(): boolean {
+    existsInGraph(): boolean {
       return !!this.uid
     }
 

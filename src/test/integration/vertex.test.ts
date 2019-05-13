@@ -92,7 +92,7 @@ describe("Vertex", () => {
       expect(pet).toBeDefined()
       await pet.deleteFrom(graph)
       const deletedPet = await graph.get(Pet, pet.uid)
-      if (deletedPet) expect(deletedPet.exists).toBe(false)
+      if (deletedPet) expect(deletedPet.existsInGraph()).toBe(false)
     } else fail("No pet")
   })
   describe("Linking", () => {
