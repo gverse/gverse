@@ -27,9 +27,12 @@ namespace Gverse {
   }
 
   export interface QueryOptions {
+    // Sorting order, e.g. "orderasc:age" or "orderdesc:createdAt"
     order?: string
+    /** Maximum number of vertices to return, useful for pagination with offset. */
     limit?: number
-    depth?: number
+    /** Offset for paginated results. Use with limit. */
+    offset?: number
   }
 
   /** Represents a dgraph transaction that can be created on demand or explicitly. */
@@ -370,7 +373,7 @@ namespace Gverse {
      * Result must be named "vertices" for unmarshaling to work. E.g.
      *   `{vertices(func:uid("0x1)) { uid name }}`.
      *
-     * For custom queries that do not require marshaling, use Transaction.query.
+     * For custom queries that do not require unmarshaling, use Transaction.query.
      */
     async query(
       vertexClass: typeof Vertex,
@@ -418,17 +421,20 @@ namespace Gverse {
     /** Query and unmarshal matching vertices */
     async all(
       vertexClass: typeof Vertex,
-      { order, limit }: QueryOptions = {},
+      { order, limit, offset }: QueryOptions = {},
       transaction?: Transaction,
       depth: number = 3
     ): Promise<Vertex[] | undefined> {
       limit = (limit && limit < 10000 && limit) || 1000
       const orderPhrase = (order && `, ${order}`) || ""
       const limitPhrase = `, first:${limit}`
+      const offsetPhrase = (offset && `, offset:${offset}`) || ""
       log("Graph.all", vertexClass.name)
       return await this.queryWithFunction(
         vertexClass,
-        `eq(type,"${vertexClass.name}") ${orderPhrase} ${limitPhrase}`,
+        `eq(type,"${
+          vertexClass.name
+        }") ${orderPhrase} ${limitPhrase} ${offsetPhrase}`,
         transaction,
         depth
       )
