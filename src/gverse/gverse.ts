@@ -776,7 +776,7 @@ namespace Gverse {
     autoMarshal(traverse = true): any {
       let vertex: any = this
       let values: any = {}
-      for (let key in vertex) {
+      Object.getOwnPropertyNames(vertex).forEach(key => {
         let predicate: any = vertex[key]
         // ignore _* private instance variables and special variables
         if (!key.startsWith("_")) {
@@ -802,7 +802,7 @@ namespace Gverse {
             values[key.replace("$", "@")] = predicate
           }
         }
-      }
+      })
       return values
     }
 
