@@ -40,6 +40,7 @@ describe("Vertex", () => {
       tom.name$ur = "ٹوم"
       const values = tom.marshal()
       expect(values.name).toBe("Tom")
+      expect(values).not.toContain("graph")
       expect(values["name@ur"]).toBe("ٹوم")
     })
   })
