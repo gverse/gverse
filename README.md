@@ -45,8 +45,8 @@ const graph = new Gverse.Graph(
 #### Define a Gverse.Vertex class
 
 ```typescript
-class Person extends Gverse.Vertex {
-  type = "Person" // type name
+class User extends Gverse.Vertex {
+  type = "User" // type name
   name: string = ""
 }
 ```
@@ -54,18 +54,37 @@ class Person extends Gverse.Vertex {
 #### Create the vertex on the graph
 
 ```typescript
-const person = new Person()
-person.name = "Zak"
+const User = new User()
+User.name = "Zak"
 // save and get the auto-generated universal id
-const uid = await graph.create(person)
+const uid = await graph.create(User)
 ```
 
 #### Load a vertex from the graph
 
 ```typescript
-const zak = (await graph.get(uid)) as Person
-console.log(zak.name) // = "Zak"
+const user = (await graph.get(uid)) as User
+console.log(user.name) // = "Zak"
 ```
+
+For detailed examples, please see the integration tests under `./test/integration`.
+
+#### Defining edges (links to other vertices)
+
+```typescript
+class Repo {
+  type: "Repo"
+  name: string
+  owner: User
+  contributors: User[]
+  _edges: {
+    owner: Edge.toVertex(User),
+    contributors: Edge.toVertices(User)
+  }
+}
+```
+
+Edges can be directed or undirected (reversible), and can have a cardinality of one or many.
 
 For detailed examples, please see the integration tests under `./test/integration`.
 
