@@ -46,7 +46,7 @@ const graph = new Gverse.Graph(
 
 ```typescript
 class User extends Gverse.Vertex {
-  type = "User" // type name
+  type = "User"
   name: string = ""
 }
 ```
@@ -54,10 +54,9 @@ class User extends Gverse.Vertex {
 #### Create the vertex on the graph
 
 ```typescript
-const User = new User()
-User.name = "Zak"
-// save and get the auto-generated universal id
-const uid = await graph.create(User)
+const user = new User()
+user.name = "Zak"
+await graph.create(user)
 ```
 
 #### Load a vertex from the graph
@@ -73,7 +72,7 @@ For detailed examples, please see the integration tests under `./test/integratio
 
 ```typescript
 class Repo {
-  type: "Repo"
+  type: "Repository"
   name: string
   owner: User
   contributors: User[]
