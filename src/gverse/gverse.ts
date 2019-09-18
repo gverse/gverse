@@ -208,9 +208,7 @@ namespace Gverse {
         return true
       } catch (error) {
         log(
-          `Could not connect to Dgraph alpha at ${this.environment.host}:${
-            this.environment.port
-          }`,
+          `Could not connect to Dgraph alpha at ${this.environment.host}:${this.environment.port}`,
           error
         )
         this.verified = false
@@ -434,9 +432,7 @@ namespace Gverse {
       log("Graph.all", vertexClass.name)
       return await this.queryWithFunction(
         vertexClass,
-        `eq(type,"${
-          vertexClass.name
-        }") ${orderPhrase} ${limitPhrase} ${offsetPhrase}`,
+        `eq(type,"${vertexClass.name}") ${orderPhrase} ${limitPhrase} ${offsetPhrase}`,
         transaction,
         depth
       )
@@ -491,15 +487,10 @@ namespace Gverse {
       let values: any = vertex.marshal(traverse)
       await vertex.beforeDelete(values)
       const delMut = { uid: vertex.uid }
-      const deleted = await tx.delete(delMut)
-      if (deleted) {
-        log("Deleted", vertex.uid)
-        await vertex.afterDelete(values)
-        return true
-      } else {
-        log("Deleted", vertex.uid)
-      }
-      return false
+      const res = await tx.delete(delMut)
+      log("Deleted", vertex.uid)
+      await vertex.afterDelete(values)
+      return true
     }
 
     /** Save the current values into the graph. Returns the vertex with uid. */

@@ -19,6 +19,8 @@ export class Pet extends Gverse.Vertex {
   afterCreateSet = false
   beforeUpdateSet = false
   afterUpdateSet = false
+  beforeDeleteSet = false
+  afterDeleteSet = false
 
   _edges: any = {
     owner: Gverse.Edge.toVertex(Owner),
@@ -52,6 +54,12 @@ export class Pet extends Gverse.Vertex {
   }
   async afterUpdate() {
     this.afterUpdateSet = true
+  }
+  async beforeDelete() {
+    this.beforeDeleteSet = true
+  }
+  async afterDelete() {
+    this.afterDeleteSet = true
   }
 }
 
