@@ -145,6 +145,16 @@ describe("Vertex", () => {
       if (!petFromGraph) fail("Not found")
       else expect(petFromGraph.beforeUpdateSet).toBe(true)
     })
+    it("calls before and after delete", async () => {
+      expect(pet.beforeDeleteSet).toBe(false) // precondition
+      expect(pet.afterDeleteSet).toBe(false) // precondition
+      let deletedPet = await pet.deleteFrom(graph)
+      if (!deletedPet) fail("Can not be deleted")
+      else {
+        expect(pet.beforeDeleteSet).toBeTruthy()
+        expect(pet.afterDeleteSet).toBeTruthy()
+      }
+    })
   })
   describe("language support", () => {
     it("updates secondary languages", async () => {
