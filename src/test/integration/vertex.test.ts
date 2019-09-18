@@ -92,7 +92,9 @@ describe("Vertex", () => {
       expect(pet).toBeDefined()
       await pet.deleteFrom(graph)
       const deletedPet = await graph.get(Pet, pet.uid)
-      if (deletedPet) expect(deletedPet.existsInGraph()).toBe(false)
+      if (deletedPet) {
+        expect(deletedPet.existsInGraph()).toBe(false)
+      }
     } else fail("No pet")
   })
   describe("Linking", () => {
@@ -139,11 +141,23 @@ describe("Vertex", () => {
     })
     it("calls before and after update", async () => {
       expect(pet.beforeUpdateSet).toBe(false) // precondition
+      expect(pet.afterUpdateSet).toBe(false)
       pet.name = "Garfield"
       await pet.saveInto(graph)
+      expect(pet.afterUpdateSet).toBe(true)
       const petFromGraph = (await pet.loadFrom(graph)) as Pet
       if (!petFromGraph) fail("Not found")
-      else expect(petFromGraph.beforeUpdateSet).toBe(true)
+      else {
+        expect(petFromGraph.beforeUpdateSet).toBe(true)
+      }
+    })
+    it("calls after delete", async () => {
+      expect(pet.afterDeleteSet).toBe(false) // precondition
+      let deletedPet = await pet.deleteFrom(graph)
+      if (!deletedPet) fail("Can not be deleted")
+      else {
+        expect(pet.afterDeleteSet).toBeTruthy()
+      }
     })
   })
   describe("language support", () => {
