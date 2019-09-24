@@ -69,6 +69,17 @@ describe("Gverse", () => {
         .query(`{ pets(func:uid(${newUid})) @filter(eq(type,${type})) {uid} }`)
       expect(res.pets).toEqual([])
     })
+    it("retries pending transaction", async () => {
+      const tx = conn.newTransaction(true)
+      const uid = await tx.mutate({
+        pet: { name: "Transient", type: type }
+      })
+      await Promise.all([
+        conn.newTransaction(true).mutate({ uid, name: "Name" }),
+        conn.newTransaction(true).delete({ uid }),
+        conn.newTransaction(true).mutate({ uid, name: "New Name" })
+      ])
+    })
   })
   describe("Graph", () => {
     it("has expansions", () => {
