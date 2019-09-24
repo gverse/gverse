@@ -83,7 +83,7 @@ namespace Gverse {
         }
         if (shouldRetry(e, retries)) {
           this.txn = this.connection.client.newTxn({ readOnly: true })
-          await waitPromise()
+          await waitPromise(`query ${query}`)
           return await this.query(query, variables, retries + 1)
         } else {
           log("Failed to query:", query, "; error:", e)
@@ -112,7 +112,7 @@ namespace Gverse {
         }
         if (shouldRetry(e, retries)) {
           this.txn = this.connection.client.newTxn()
-          await waitPromise()
+          await waitPromise(`mutate ${JSON.stringify(values)}`)
           return await this.mutate(values, retries + 1)
         } else {
           throw Error(e)
@@ -189,7 +189,7 @@ namespace Gverse {
         }
         if (shouldRetry(e, retries)) {
           this.txn = this.connection.client.newTxn()
-          await waitPromise()
+          await waitPromise(`delete ${JSON.stringify(values)}`)
           return await this.query(values, retries + 1)
         } else {
           log("Failed to delete:", values, "; error:", e)
@@ -289,7 +289,7 @@ namespace Gverse {
         await this.client.alter(op)
       } catch (e) {
         if (shouldRetry(e, retries)) {
-          await waitPromise()
+          await waitPromise(`schema ${schema}`)
           return await this.applySchema(schema, retries + 1)
         } else {
           log(e)
@@ -339,9 +339,8 @@ namespace Gverse {
     /** Set up default Gverse schema and create all indices  */
     async setIndices() {
       log("Setting indices", this.indices)
-      return await this.connection.applySchema(
-        DEFAULT_SCHEMA + "\n" + this.indices
-      )
+      await this.connection.applySchema(DEFAULT_SCHEMA + "\n" + this.indices)
+      return await waitPromise("set indices", 100)
     }
 
     /** Get a vertex from the graph with *all* predicates for given uid. */
@@ -899,7 +898,8 @@ process.on("unhandledRejection", (reason, p) => {
 })
 
 /** Returns an promise with timeout. Used for retries. */
-function waitPromise(time: number = 25): Promise<void> {
+function waitPromise(purpose = "unknown", time: number = 50): Promise<void> {
+  log("Waiting for", time, "ms", "for", purpose)
   return new Promise(
     (resolve: (value?: void | PromiseLike<void>) => void): void => {
       const id = setTimeout(() => {
@@ -913,6 +913,7 @@ function waitPromise(time: number = 25): Promise<void> {
 /** Returns true if the error is retry-able and we have retries remaining */
 function shouldRetry(error: Error, retries: number): boolean {
   if (!error) return false
+  log("Should retry", retries, ";error: ", error)
   return error.message.includes("retry") && retries < MaxRetries
 }
 
