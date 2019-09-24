@@ -87,8 +87,8 @@ namespace Gverse {
         } catch (e) {
           log(e)
         }
-        console.log(
-          "!!! Pending transaction catch take",
+        log(
+          "!!! Pending query transaction take",
           retries,
           "\nquery:",
           query,
@@ -97,7 +97,6 @@ namespace Gverse {
         )
         if (retries < MaxRetries) {
           this.txn = this.connection.client.newTxn({ readOnly: true })
-          console.log("🙉🙉🙉 Retrying query", query, "attempt", retries)
           return await this.query(query, variables, retries + 1)
         }
       }
@@ -132,8 +131,8 @@ namespace Gverse {
         } catch (e) {
           log(e)
         }
-        console.log(
-          "!!! Pending transaction catch take",
+        log(
+          "!!! Pending mutate transaction take",
           retries,
           "\nvalues:",
           values,
@@ -142,7 +141,6 @@ namespace Gverse {
         )
         if (retries < MaxRetries) {
           this.txn = this.connection.client.newTxn({ readOnly: true })
-          console.log("🙉🙉🙉 Retrying mutate [", values, "] attempt", retries)
           return await this.mutate(values, retries + 1)
         } else {
           return undefined
