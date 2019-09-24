@@ -157,10 +157,14 @@ namespace Gverse {
       }
       try {
         const mu = new dgraph.Mutation()
+        const uidTypes = values.map((u: any) => {
+          return { uid: u.uid, type: null }
+        })
+        console.log("uidTypes", uidTypes)
         mu.setCommitNow(this.autoCommit)
-        mu.setDeleteJson(values)
-        const uid = await this.txn.mutate(mu)
-        log(`Transaction ${this.uuid} deleted`, uid)
+        mu.setDeleteJson(uidTypes)
+        const uid: any = await this.txn.mutate(mu)
+        log(`Transaction ${this.uuid} deleted`, uid.getUidsMap())
         return uid.getUidsMap().get("blank-0")
       } catch (e) {
         log(`Transaction ${this.uuid} delete failed`, values, e)
@@ -276,6 +280,7 @@ namespace Gverse {
   export class Graph {
     constructor(private connection: Connection) {}
     indices: string = ""
+    types: string = ""
 
     /** Verifies that a connection can be made to the graph server */
     async connect(announce: boolean = false) {

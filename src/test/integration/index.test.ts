@@ -3,7 +3,7 @@ import Gverse from "../../gverse"
 const config: Gverse.Environment = {
   host: "localhost",
   port: 9080,
-  debug: false
+  debug: true
 }
 
 describe("Gverse", () => {
@@ -14,6 +14,7 @@ describe("Gverse", () => {
       await connection.disconnect()
     })
   })
+
   describe("Transaction", () => {
     const conn = new Gverse.Connection(config)
     const type = "TestVertex"
@@ -24,12 +25,14 @@ describe("Gverse", () => {
     afterAll(() => {
       conn.disconnect()
     })
-
     beforeEach(async () => {
       await conn.clear(type)
     })
-
-    it("mutates", async () => {
+    it("simple-mutate", async () => {
+      await conn.applySchema(`
+      type TestVertex {
+        name: string
+      }`)
       const tx = conn.newTransaction(true)
       await tx.mutate({ pet: { name: "Bigglesworth", type: type } })
     })
@@ -57,7 +60,7 @@ describe("Gverse", () => {
       expect(res.pets[0].name).toBe("Alpha")
       expect(res.pets[0]["name@ur"]).toBe(urduName)
     })
-    it("deletes", async () => {
+    it("simple-deletes", async () => {
       const tx = conn.newTransaction(true)
       const newUid = await tx.mutate({
         pet: { name: "Bigglesworth", type: type }
