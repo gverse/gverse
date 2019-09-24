@@ -12,12 +12,6 @@ const log = debug("Gverse")
 const preventClearInProduction = false
 const MaxRetries = 5
 
-/* Catch any unhandled promises and report in logs */
-process.on("unhandledRejection", (reason, p) => {
-  console.warn("Unhandled Rejection at: Promise", p, "reason:", reason)
-  // application specific logging, throwing an error, or other logic here
-})
-
 namespace Gverse {
   const DEFAULT_SCHEMA = "<type>: string @index(exact) ."
 
@@ -49,7 +43,7 @@ namespace Gverse {
       if (verifyConnection && (!connection || !connection.verified)) {
         const issue = "Can not create transaction. No verified connection."
         log(issue)
-        throw issue
+        throw Error(issue)
       }
       this.txn = connection.client.newTxn({ readOnly })
     }
@@ -87,32 +81,15 @@ namespace Gverse {
         } catch (e) {
           log(e)
         }
-        log(
-          "Pending query transaction take",
-          retries,
-          "\nquery:",
-          query,
-          "\nerror:",
-          e
-        )
-        if (e.message.includes("retry") && retries < MaxRetries) {
+        if (shouldRetry(e, retries)) {
           this.txn = this.connection.client.newTxn({ readOnly: true })
+          await waitPromise()
           return await this.query(query, variables, retries + 1)
         } else {
-          throw e
+          log("Failed to query:", query, "; error:", e)
+          throw Error(e)
         }
       }
-    }
-
-    wait(time: number = 50): Promise<void> {
-      return new Promise(
-        (resolve: (value?: void | PromiseLike<void>) => void): void => {
-          const id = setTimeout(() => {
-            clearTimeout(id)
-            resolve()
-          }, time)
-        }
-      )
     }
 
     /** Mutate json-compliant object into graph space */
@@ -133,19 +110,12 @@ namespace Gverse {
         } catch (e) {
           log(e)
         }
-        log(
-          "Pending mutate transaction take",
-          retries,
-          "\nvalues:",
-          values,
-          "\nerror:",
-          e
-        )
-        if (e.message.includes("retry") && retries < MaxRetries) {
-          this.txn = this.connection.client.newTxn({ readOnly: true })
+        if (shouldRetry(e, retries)) {
+          this.txn = this.connection.client.newTxn()
+          await waitPromise()
           return await this.mutate(values, retries + 1)
         } else {
-          throw e
+          throw Error(e)
         }
       }
     }
@@ -197,7 +167,7 @@ namespace Gverse {
     /** Delete vertices with given values. Values should be a list
      * of objects with uids or an object with uid.
      */
-    async delete(values: any) {
+    async delete(values: any, retries = 0) {
       log(`Transaction ${this.uuid} deleting values`, values)
       if (!values.uid && values.length < 1) {
         log("Nothing to delete")
@@ -212,8 +182,19 @@ namespace Gverse {
         return uid.getUidsMap().get("blank-0")
       } catch (e) {
         log(`Transaction ${this.uuid} delete failed`, values, e)
-        this.txn.discard()
-        throw Error(e)
+        try {
+          this.txn.discard()
+        } catch (e) {
+          log(e)
+        }
+        if (shouldRetry(e, retries)) {
+          this.txn = this.connection.client.newTxn()
+          await waitPromise()
+          return await this.query(values, retries + 1)
+        } else {
+          log("Failed to delete:", values, "; error:", e)
+          throw Error(e)
+        }
       }
     }
   }
@@ -295,20 +276,25 @@ namespace Gverse {
           await this.client.alter(op)
         }
       } catch (e) {
-        log(e)
-        throw e
+        log("Failed to clear:", e)
+        throw Error(e)
       }
     }
 
-    async applySchema(schema: string) {
+    async applySchema(schema: string, retries = 0): Promise<any> {
       try {
-        log("Apply schema", schema)
+        log("Apply schema take", retries, "schema: ", schema)
         const op = new dgraph.Operation()
         op.setSchema(schema)
         await this.client.alter(op)
       } catch (e) {
-        log(e)
-        throw e
+        if (shouldRetry(e, retries)) {
+          await waitPromise()
+          return await this.applySchema(schema, retries + 1)
+        } else {
+          log(e)
+          throw Error(e)
+        }
       }
     }
 
@@ -366,7 +352,7 @@ namespace Gverse {
       transaction?: Transaction
     ): Promise<Vertex | undefined> {
       log("Graph.get", vertexClass.name, uid)
-      if (!uid) throw "No uid provided"
+      if (!uid) throw Error("No uid provided")
       const tx = transaction || this.connection.newTransaction(true)
       const res = await tx.query(
         `{vertex(func:uid(${uid})) @filter(has(type)) { ${Graph.expansion(
@@ -904,6 +890,30 @@ namespace Gverse {
       return this.autoUnmarshal(this, values) as Vertex
     }
   }
+}
+
+/* Catch any unhandled promises and report in logs */
+process.on("unhandledRejection", (reason, p) => {
+  console.warn("Unhandled Rejection at: Promise", p, "reason:", reason)
+  // application specific logging, throwing an error, or other logic here
+})
+
+/** Returns an promise with timeout. Used for retries. */
+function waitPromise(time: number = 25): Promise<void> {
+  return new Promise(
+    (resolve: (value?: void | PromiseLike<void>) => void): void => {
+      const id = setTimeout(() => {
+        clearTimeout(id)
+        resolve()
+      }, time)
+    }
+  )
+}
+
+/** Returns true if the error is retry-able and we have retries remaining */
+function shouldRetry(error: Error, retries: number): boolean {
+  if (!error) return false
+  return error.message.includes("retry") && retries < MaxRetries
 }
 
 export default Gverse
