@@ -96,7 +96,8 @@ export class VertexFixtures {
   public origin?: Origin
 
   private async clear() {
-    await Promise.all([conn.clear("Pet"), conn.clear("Owner")])
+    await conn.clear(Pet.name)
+    await conn.clear(Owner.name)
     await conn.applySchema(
       "name: string @index(exact) @lang . \n" + "<origin>: uid @reverse . \n"
     )

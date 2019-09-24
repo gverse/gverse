@@ -18,11 +18,11 @@ describe("Gverse", () => {
     const conn = new Gverse.Connection(config)
     const type = "TestVertex"
 
-    beforeAll(() => {
-      conn.connect()
+    beforeAll(async () => {
+      await conn.connect()
     })
-    afterAll(() => {
-      conn.disconnect()
+    afterAll(async () => {
+      await conn.disconnect()
     })
 
     beforeEach(async () => {
@@ -66,8 +66,8 @@ describe("Gverse", () => {
       await conn.newTransaction(true).delete({ uid: newUid })
       const res = await conn
         .newTransaction(true)
-        .query(`{pets(func:eq(uid,${newUid})) {uid}}`)
-      expect(res).toBeUndefined()
+        .query(`{ pets(func:uid(${newUid})) @filter(eq(type,${type})) {uid} }`)
+      expect(res.pets).toEqual([])
     })
   })
   describe("Graph", () => {

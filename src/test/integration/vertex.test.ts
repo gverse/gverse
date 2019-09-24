@@ -23,6 +23,7 @@ describe("Vertex", () => {
   })
 
   beforeEach(async () => {
+    await conn.clear(Pet.name)
     fixtures = await new VertexFixtures().build()
     pet = fixtures.pet || fail()
     owner = fixtures.owner || fail()

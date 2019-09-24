@@ -10,6 +10,7 @@ import _ from "lodash"
  */
 const log = debug("Gverse")
 const preventClearInProduction = false
+const MaxRetries = 5
 
 /* Catch any unhandled promises and report in logs */
 process.on("unhandledRejection", (reason, p) => {
@@ -42,14 +43,15 @@ namespace Gverse {
     constructor(
       readonly connection: Connection,
       public autoCommit: boolean,
-      verifyConnection = false
+      verifyConnection = false,
+      private readOnly: boolean = false
     ) {
       if (verifyConnection && (!connection || !connection.verified)) {
         const issue = "Can not create transaction. No verified connection."
         log(issue)
         throw issue
       }
-      this.txn = connection.client.newTxn()
+      this.txn = connection.client.newTxn({ readOnly })
     }
 
     /** Commit the transaction and apply all operations. */
@@ -66,7 +68,7 @@ namespace Gverse {
     }
 
     /** Returns object representation of the response JSON */
-    async query(query: string, variables?: any) {
+    async query(query: string, variables?: any, retries = 0): Promise<any> {
       log(
         `Transaction ${this.uuid} querying`,
         query,
@@ -80,12 +82,40 @@ namespace Gverse {
         return res.getJson()
       } catch (e) {
         log(e)
-        this.txn.discard()
+        try {
+          this.txn.discard()
+        } catch (e) {
+          log(e)
+        }
+        console.log(
+          "!!! Pending transaction catch take",
+          retries,
+          "\nquery:",
+          query,
+          "\nerror:",
+          e
+        )
+        if (retries < MaxRetries) {
+          this.txn = this.connection.client.newTxn({ readOnly: true })
+          console.log("🙉🙉🙉 Retrying query", query, "attempt", retries)
+          return await this.query(query, variables, retries + 1)
+        }
       }
     }
 
+    wait(time: number = 50): Promise<void> {
+      return new Promise(
+        (resolve: (value?: void | PromiseLike<void>) => void): void => {
+          const id = setTimeout(() => {
+            clearTimeout(id)
+            resolve()
+          }, time)
+        }
+      )
+    }
+
     /** Mutate json-compliant object into graph space */
-    async mutate(values: any) {
+    async mutate(values: any, retries = 0): Promise<any> {
       log(`Transaction ${this.uuid} mutating`, JSON.stringify(values))
       try {
         const mu = new dgraph.Mutation()
@@ -96,9 +126,27 @@ namespace Gverse {
         log(`Transaction ${this.uuid} mutated with new uid`, createdUid)
         return createdUid
       } catch (e) {
-        log(`Transaction ${this.uuid} mutate failed`, values, e)
-        this.txn.discard()
-        throw Error(e)
+        log(e)
+        try {
+          this.txn.discard()
+        } catch (e) {
+          log(e)
+        }
+        console.log(
+          "!!! Pending transaction catch take",
+          retries,
+          "\nvalues:",
+          values,
+          "\nerror:",
+          e
+        )
+        if (retries < MaxRetries) {
+          this.txn = this.connection.client.newTxn({ readOnly: true })
+          console.log("🙉🙉🙉 Retrying mutate [", values, "] attempt", retries)
+          return await this.mutate(values, retries + 1)
+        } else {
+          return undefined
+        }
       }
     }
 
@@ -188,7 +236,7 @@ namespace Gverse {
     /** Verifies the connection. There's no connect operation per-se. */
     async connect(announce: boolean = false): Promise<boolean> {
       try {
-        const tx = new Transaction(this, true, false)
+        const tx = new Transaction(this, true, false, true)
         const res = await tx.query(
           `{total (func: has(_predicate_)) {count(uid)}}`
         )
@@ -217,13 +265,13 @@ namespace Gverse {
     }
 
     /** Returns a new transaction with auto commit (immediate) option. */
-    newTransaction(autoCommit = false): Transaction {
-      return new Transaction(this, autoCommit)
+    newTransaction(autoCommit = false, readOnly = false): Transaction {
+      return new Transaction(this, autoCommit, false, readOnly)
     }
 
     /** Immediate query with autoCommit transaction */
     async query(query: any, variables?: any) {
-      return await this.newTransaction(true).query(query, variables)
+      return await this.newTransaction(true, true).query(query, variables)
     }
 
     /** Clears the graph by dropping all vertices, edges and predicates
