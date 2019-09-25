@@ -15,7 +15,7 @@ export class Pet extends Gverse.Vertex {
   breed: string = ""
   origin?: Origin
   owner?: Owner
-  beforeCreatedSet = false
+  beforeCreateSet = false
   afterCreateSet = false
   beforeUpdateSet = false
   afterUpdateSet = false
@@ -44,7 +44,7 @@ export class Pet extends Gverse.Vertex {
     return updated as Pet
   }
   async beforeCreate() {
-    this.beforeCreatedSet = true
+    this.beforeCreateSet = true
   }
   async afterCreate() {
     this.afterCreateSet = true
@@ -61,6 +61,9 @@ export class Pet extends Gverse.Vertex {
   async afterDelete() {
     this.afterDeleteSet = true
   }
+  // async loadFrom(graph: Gverse.Graph): Promise<Pet> {
+  //   return graph.load(this) as Pet
+  // }
 }
 
 export class Owner extends Gverse.Vertex {
