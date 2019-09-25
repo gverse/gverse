@@ -69,7 +69,7 @@ describe("Gverse", () => {
         .query(`{ pets(func:uid(${newUid})) @filter(eq(type,${type})) {uid} }`)
       expect(res.pets).toEqual([])
     })
-    it("retries pending transaction", async () => {
+    it("retries conflicting transactions", async () => {
       const tx = conn.newTransaction(true)
       const uid = await tx.mutate({
         pet: { name: "Transient", type: type }
