@@ -336,7 +336,11 @@ namespace Gverse {
     /** Deletes all vertices of matching */
     async clear(type?: string) {
       await this.connection.clear(type)
-      return await this.setIndices()
+      log("Warning: Schema was dropped - recreating.")
+      if (type == undefined) {
+        // schema was dropped, recreate
+        await this.setIndices()
+      }
     }
 
     /** Set up default Gverse schema and create all indices  */
