@@ -1,6 +1,6 @@
 {
   "name": "gverse",
-  "version": "0.4.4",
+  "version": "0.4.1",
   "description": "Object Graph Mapper for Dgraph",
   "main": "dist/gverse/index.js",
   "types": "dist/gverse/index.d.ts",

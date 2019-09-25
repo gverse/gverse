@@ -9,10 +9,14 @@ import _ from "lodash"
  * `DEBUG=Gverse <script ...>`
  */
 const log = debug("Gverse")
-const preventClearInProduction = false
-const MaxRetries = 5
+const preventClearInProduction = false // should prevent clear from being invoked in prod
+const MaxRetries = 5 // times to retry pending/aborted transactions
+const SchemaBuildTime = 100 // ms to wait after schema change
 
 namespace Gverse {
+  /** Gverse using type to define vertex schema.
+   * Future: Dgraph 1.1 supports intrinsic types. Gverse types will be migrated.
+   */
   const DEFAULT_SCHEMA = "<type>: string @index(exact) ."
 
   export interface Environment {
@@ -297,7 +301,6 @@ namespace Gverse {
         }
       }
     }
-
     async disconnect() {
       log("Disconnecting from dgraph")
       await this.stub.close()
@@ -340,7 +343,7 @@ namespace Gverse {
     async setIndices() {
       log("Setting indices", this.indices)
       await this.connection.applySchema(DEFAULT_SCHEMA + "\n" + this.indices)
-      return await waitPromise("set indices", 100)
+      return await waitPromise("set indices", SchemaBuildTime)
     }
 
     /** Get a vertex from the graph with *all* predicates for given uid. */
@@ -898,7 +901,7 @@ process.on("unhandledRejection", (reason, p) => {
 })
 
 /** Returns an promise with timeout. Used for retries. */
-function waitPromise(purpose = "unknown", time: number = 50): Promise<void> {
+function waitPromise(purpose = "unknown", time: number = 15): Promise<void> {
   log("Waiting for", time, "ms", "for", purpose)
   return new Promise(
     (resolve: (value?: void | PromiseLike<void>) => void): void => {
