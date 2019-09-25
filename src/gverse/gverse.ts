@@ -104,9 +104,12 @@ namespace Gverse {
         mu.setCommitNow(this.autoCommit)
         mu.setSetJson(values)
         const uidMap = await this.txn.mutate(mu)
-        const createdUid = uidMap.getUidsMap().get("blank-0")
-        log(`Transaction ${this.uuid} mutated with new uid`, createdUid)
-        return createdUid
+        const updatedUid = uidMap.getUidsMap().get("blank-0") || values.uid
+        if (!updatedUid) {
+          return values.uid
+        }
+        log(`Transaction ${this.uuid} mutated with new uid`, updatedUid)
+        return updatedUid
       } catch (e) {
         log(e)
         try {
