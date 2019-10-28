@@ -36,7 +36,8 @@ services:
       - 9080:9080
     restart: on-failure
     command: dgraph alpha --my=server:7080 --lru_mb=2048 --zero=zero:5080
-    depends_on: zero
+    depends_on:
+      - zero
 
 volumes:
   dgraph:
