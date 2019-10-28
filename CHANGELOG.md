@@ -1,15 +1,20 @@
-### Version pre-1-1
+# Changelog
 
-##### Gverse types have been dropped in favor of Dgraph System
+All notable changes to this project will be documented in this file.
 
-##### Clasess broken into multiple files. You can now import individual classes:
+## 1.0.0-pre
+
+### Changes
+
+Clasess broken into multiple files. You can now import individual classes like so:
 
 ```typescript
-import { Connection } from "gverse/connect"
+import { Connection } from "gverse/connection"
 ```
 
-The old way still works as well:
+The old way also works:
 
 ```typescript
 import Gverse from "gverse"
+// usage: Gverse.Connection...
 ```

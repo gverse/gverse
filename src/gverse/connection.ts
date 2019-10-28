@@ -4,6 +4,8 @@ import chalk from "chalk"
 import log from "./debug-logger"
 import { Transaction } from "./transaction"
 import { shouldRetry, waitPromise } from "./retry"
+
+/** Connection environment */
 export interface Environment {
   host: string
   port: number
