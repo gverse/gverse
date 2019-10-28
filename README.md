@@ -1,30 +1,52 @@
-# Gverse - Object Graph Mapper for Dgraph
+# Gverse
 
-Gverse is an Object Graph Mapper (OGM) for the [Dgraph](dgraph.io) open-source [Graph Database](https://en.wikipedia.org/wiki/Graph_database).
+#### Object Graph Mapper for Dgraph
+
+![GitHub](https://img.shields.io/github/license/gverse/gverse) ![CircleCI](https://img.shields.io/circleci/build/github/gverse/gverse) ![npm type definitions](https://img.shields.io/npm/types/gverse) ![GitHub package.json version](https://img.shields.io/github/package-json/v/gverse/gverse)
+
+Gverse is an Object Graph Mapper (OGM) for the [Dgraph](dgraph.io), the high-performance open-source [Graph Database](https://en.wikipedia.org/wiki/Graph_database). Gverse is written in TypeScript and supports TypeScript 3 and JavaScript ES6.
 
 #### What's an OGM?
 
 An OGM enables developers to work with their graph models through idiomatic objects provided by their native programming language. It is similar in concept to Object-Relational Mapping (ORM) libraries such as [TypeORM](typeorm.io), [Sequelize](http://docs.sequelizejs.com/) or [Hibernate](https://hibernate.org/) but with some fundamental differences ([see below](#gverse-vs-traditional-orms)).
 
-### Getting Started
+#### Features
+
+- Simple API for working with graphs vertices (nodes) and edges (links)
+- Strongly typed classes and predicates (attributes) when using TypeScript
+- Automatically marshal and unmarshal JavaScript objects to and from Graph vertices
+- Support for custom marshaling and unmarshaling methods
+- Support for directed and undirected edges
+- Support for transactions and batch updates
+- Before and after hooks for create, update and delete operations
+- Query options for ordering and pagination
+
+Roadmap:
+
+- Decorators for object-to-graph mapping (v1.1)
+- Support for Dgraph 1.1 Types
+
+##### Compatibility with Dgraph
+
+Gverse supports Dgraph version 1.0.x. Work is underway for supporting the new [Type System in Dgraph 1.1](https://docs.dgraph.io/master/query-language/#type-system).
+
+### Getting started
 
 Here's a quick start guide to get you up and running.
 
 #### Install Dgraph
 
-Make sure you have [Dgraph installed and running](https://docs.dgraph.io/get-started). This guide assumes you have Dgraph running on default port (9080).
+Make sure you have [Dgraph installed and running](https://docs.dgraph.io/get-started). This guide assumes you have Dgraph running on default ports (8080 for HTTP and 9080 gRPC).
 
-#### Set up your ES6 or TypeScript environment
+#### Set up your TypeScript or JavaScript ES6 environments
 
-Gverse requires ES6 with class properties plugin or TypeScript ≥ 2.0. TypeScript 3.4 or higher is recommended.
+Gverse requires ES6 with class properties plugin or TypeScript ≥ 2.0.
 
-- Configure [Babel](https://babel.org) (see [quick start guide](https://www.robinwieruch.de/minimal-node-js-babel-setup/)) and add the [Class Properties Plugin](https://babeljs.io/docs/en/babel-plugin-proposal-class-properties)
+- Configure your project for [TypeScript](https://www.typescriptlang.org/docs/tutorial.html) (see [getting started guide](https://levelup.gitconnected.com/typescript-quick-start-guide-7257c2b71538)),
+  – or –
+- Configure [Babel](https://babel.org) (see [quick start guide](https://www.robinwieruch.de/minimal-node-js-babel-setup/)) and add the [Class Properties Plugin](https://babeljs.io/docs/en/babel-plugin-proposal-class-properties).
 
-or
-
-- Use [TypeScript](https://www.typescriptlang.org/docs/tutorial.html) (see [getting started guide](https://levelup.gitconnected.com/typescript-quick-start-guide-7257c2b71538))
-
-#### Install Gverse package
+#### Install the Gverse package
 
 ```sh
 npm install gverse
@@ -32,7 +54,7 @@ npm install gverse
 
 or if you prefer, `yarn add gverse`. The package includes TypeScript types.
 
-#### Create a Gverse graph object
+#### Create a Gverse graph session
 
 ```typescript
 import Gverse from "gverse"
@@ -42,7 +64,7 @@ const graph = new Gverse.Graph(
 )
 ```
 
-#### Define a Gverse.Vertex class
+#### Define a vertex class
 
 ```typescript
 class User extends Gverse.Vertex {
@@ -83,9 +105,7 @@ class Repo {
 }
 ```
 
-Edges can be directed or undirected (reversible), and can have a cardinality of one or many.
-
-For detailed examples, please see the integration tests under `./test/integration`.
+Edges can be directed or undirected (reversible), and can have a cardinality of one or many. For detailed examples, please see the integration tests under `./test/integration`.
 
 ### Running Tests
 
@@ -95,33 +115,9 @@ Test coverage for Gverse comes from integration tests. [Docker](https://docs.doc
 ./run-integration-tests.sh
 ```
 
-To run the unit tests (under development):
+#### Gverse OGM vs Traditional ORMs
 
-```sh
-npm run test
-```
-
-#### Gverse features
-
-Supported now:
-
-- Simple API for working with graphs
-- Strongly typed classes and predicates (instance variables) when using TypeScript
-- Automatically marshal and unmarshal JavaScript objects to and from Graph vertices
-- Support for custom marshaling and unmarshaling methods
-- Support for directed and undirected edges
-- Support for transactions and batch updates
-- Before and after hooks for create, update and delete operations
-- Query options
-
-Roadmap:
-
-- Decorators for object-to-graph mapping (v1.1)
-- Support for Dgraph 1.1 Types
-
-#### Gverse vs Traditional ORMs
-
-Gverse has some fundamental differences to popular ORMs. It's helpful to understand the key differences to avoid confusion:
+Gverse has some fundamental differences to popular ORMs. It's helpful to understand the key differences:
 
 - Gverse works with vertices and edges in a Graph structure instead of tables, columns and rows in RDBMS like MySQL, Postgres, Oracle, or documents in MongoDB, CouchDB, etc. ([learn more](https://docs.dgraph.io/query-language/)).
 - Gverse schema supports dynamic typing. You do not need to define and migrate schemas. Predicates (attributes) can be added as needed, with their data types inferred by value.
