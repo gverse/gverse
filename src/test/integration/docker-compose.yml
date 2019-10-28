@@ -1,0 +1,49 @@
+version: "3.2"
+services:
+  gverse:
+    build:
+      context: ../../../
+      dockerfile: ./src/test/integration/Dockerfile
+    working_dir: /usr/gverse
+    stdin_open: true
+    tty: true
+    command: "yarn integration"
+    depends_on:
+      - server
+
+  zero:
+    image: dgraph/dgraph:v1.0.17
+    volumes:
+      - type: volume
+        source: dgraph
+        target: /dgraph
+        volume:
+          nocopy: true
+    ports:
+      - 5080:5080
+      - 6080:6080
+    restart: on-failure
+    command: dgraph zero --my=zero:5080
+    logging:
+      driver: none
+
+  server:
+    image: dgraph/dgraph:v1.0.17
+    volumes:
+      - type: volume
+        source: dgraph
+        target: /dgraph
+        volume:
+          nocopy: true
+    ports:
+      - 8080:8080
+      - 9080:9080
+    restart: on-failure
+    command: dgraph alpha --my=server:7080 --lru_mb=2048 --zero=zero:5080
+    logging:
+      driver: none
+    depends_on:
+      - zero
+
+volumes:
+  dgraph:

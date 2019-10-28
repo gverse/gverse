@@ -1,6 +1,6 @@
 {
   "name": "gverse",
-  "version": "0.4.5",
+  "version": "1.0.0-pre",
   "description": "Object Graph Mapper for Dgraph",
   "main": "dist/gverse/index.js",
   "types": "dist/gverse/index.d.ts",
@@ -20,7 +20,7 @@
   "scripts": {
     "build": "npx tsc",
     "test": "npx jest",
-    "integration": "npx jest -i -c jest.integration.config.js",
+    "integration": "./src/test/integration/wait-for server:8080 -- npx jest -i -c jest.integration.config.js",
     "test-watch": "npx jest --watch",
     "publish": "npx tsc && npm publish"
   },

@@ -54,3 +54,4 @@ typings/
 # exports
 exports
 tsconfig.tsbuildinfo
+.vscode/
