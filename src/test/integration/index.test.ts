@@ -1,7 +1,7 @@
 import Gverse from "../../gverse"
 
 const config: Gverse.Environment = {
-  host: "localhost",
+  host: "server",
   port: 9080,
   debug: false
 }

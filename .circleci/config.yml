@@ -34,4 +34,4 @@ jobs:
           name: Set up integration test environment
           command: |
             set -x
-            docker-compose -f src/test/integration/docker-compose.yml up --build --exit-code-from app --abort-on-container-exit
+            docker-compose -f src/test/integration/docker-compose.yml up --build --exit-code-from gverse --abort-on-container-exit

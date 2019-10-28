@@ -78,8 +78,6 @@ export class Connection {
    * of the given type - or all types.
    */
   async clear(type?: string) {
-    if (this.environment.host != "localhost")
-      throw "Clear not allowed in non-local host dgraph server"
     try {
       if (type) {
         log("Clearing vertices of type", type)

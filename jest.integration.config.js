@@ -7,5 +7,6 @@ module.exports = {
     "ts-jest": {
       diagnostics: false
     }
-  }
+  },
+  testTimeout: 30000
 }

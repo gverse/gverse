@@ -89,17 +89,16 @@ For detailed examples, please see the integration tests under `./test/integratio
 
 ### Running Tests
 
+Test coverage for Gverse comes from integration tests. [Docker](https://docs.docker.com/install/) and [Docker-Compose](https://docs.docker.com/compose/install/) are required for running integration tests.
+
+```sh
+./run-integration-tests.sh
+```
+
 To run the unit tests (under development):
 
 ```sh
 npm run test
-```
-
-For integration tests, start the local Dgraph first and then run the tests:
-
-```sh
-./scripts/test_dgraph.sh # start Dgraph
-npm run integration
 ```
 
 #### Gverse features
@@ -113,12 +112,12 @@ Supported now:
 - Support for directed and undirected edges
 - Support for transactions and batch updates
 - Before and after hooks for create, update and delete operations
+- Query options
 
 Roadmap:
 
-- Decorators for object-to-graph mapping
-- Query options
-- Immutable vertex instances
+- Decorators for object-to-graph mapping (v1.1)
+- Support for Dgraph 1.1 Types
 
 #### Gverse vs Traditional ORMs
 

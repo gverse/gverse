@@ -1,7 +1,7 @@
 import Gverse from "../../gverse"
 
 export const conn = new Gverse.Connection({
-  host: "localhost",
+  host: "server",
   port: 9080,
   debug: false
 })
