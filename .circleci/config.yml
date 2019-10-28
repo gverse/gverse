@@ -27,6 +27,8 @@ jobs:
       # run unit tests
       - run: yarn test
 
+      - setup_remote_docker
+
       # run integration tests
       - run:
           name: Set up integration test environment
