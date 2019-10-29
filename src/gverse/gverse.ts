@@ -14,11 +14,11 @@ import {
 namespace Gverse {
   // --- Classes ---
   /** GRPC connection to the Dgraph server */
-  export const Connection = _Connection
+  export class Connection extends _Connection {}
   /** A Dgraph transaction */
-  export const Transaction = _Transaction
+  export class Transaction extends _Transaction {}
   /** Represents an active session with Dgraph */
-  export const Graph = _Graph
+  export class Graph extends _Graph {}
   /** Represents a vertex and connected edges and vertices.
    * Note: A vertex class must have an no-argument constructor
    * and default values for all property predicates.
@@ -35,18 +35,18 @@ namespace Gverse {
      create(name: string) {
        const person = new Person()
        person.name = name
-       return person.craeteInto(graph)
+       return person.createInto(graph)
      }
    }
    ```
    */
-  export const Vertex = _Vertex
+  export class Vertex extends _Vertex {}
   /** Represents an edge that connect a vertex to one or more vertices.
    * Vertex class should contain _edges to define the edge properties.
    * E.g. ``` _edges = { father: Edge.toVertex(Father) } ```
    * @todo @future Support facets
    */
-  export const Edge = _Edge
+  export class Edge extends _Edge {}
 
   // --- Enums ---
   export import Cardinality = _Cardinality
