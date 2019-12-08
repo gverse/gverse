@@ -22,6 +22,15 @@ export class Pet extends Gverse.Vertex {
   beforeDeleteSet = false
   afterDeleteSet = false
 
+  public static _schema = `
+    type Pet {
+      name: lang
+      breed: string
+      origin: uid
+      owner: uid
+    }
+  `
+
   _edges: any = {
     owner: Gverse.Edge.toVertex(Owner),
     origin: Gverse.Edge.toVertex(Origin)

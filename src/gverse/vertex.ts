@@ -11,10 +11,17 @@ import log from "./debug-logger"
      name: string = ""
      mother?: Person
      children?: Array<Person> = []
+
+     _schema = `
+      name: string
+      mother: [Person]
+     `
+
      _edges = {
        mother: Edge.toVertex(Person),
        children: Edge.toVertices(Person)
      }
+
      create(name: string) {
        const person = new Person()
        person.name = name
