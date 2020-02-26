@@ -253,7 +253,7 @@ export class Graph {
     log("Graph.save", vertex)
     if (!vertex.uid) throw "Can not save a vertex without a uid"
     const tx = transaction || this.connection.newTransaction(true)
-    const currentValues = await this.uid(vertex.uid, tx, 3)
+    const currentValues = await this.uid(vertex.uid, tx, traverse ? 3 : 1)
     await vertex.beforeUpdate(currentValues, vertex.marshal(traverse))
 
     // marshal again to get any updated values from beforeUpdate
