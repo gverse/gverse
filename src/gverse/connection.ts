@@ -38,7 +38,7 @@ export class Connection {
     try {
       const tx = new Transaction(this, true, false, true)
       const res = await tx.query(
-        `{total (func: has(_predicate_)) {count(uid)}}`
+        `{total (func: has(dgraph.type)) {count(uid)}}`
       )
       if (announce)
         console.log(
@@ -82,7 +82,7 @@ export class Connection {
       if (type) {
         log("Clearing vertices of type", type)
         const res = await this.query(
-          `{vertices (func: eq(type, "${type}")) { uid }}`
+          `{vertices (func: type("${type}")) { uid }}`
         )
         if (res && res.vertices)
           await this.newTransaction(true).delete(res.vertices)

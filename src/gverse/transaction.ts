@@ -70,11 +70,14 @@ export class Transaction {
   async mutate(values: any, retries = 0): Promise<any> {
     log(`Transaction ${this.uuid} mutating`, JSON.stringify(values))
     try {
+      if (!values.uid) {
+        values.uid = "_:createdUid"
+      }
       const mu = new dgraph.Mutation()
       mu.setCommitNow(this.autoCommit)
       mu.setSetJson(values)
       const uidMap = await this.txn.mutate(mu)
-      const updatedUid = uidMap.getUidsMap().get("blank-0") || values.uid
+      const updatedUid = uidMap.getUidsMap().get("createdUid") || values.uid
       if (!updatedUid) {
         return values.uid
       }

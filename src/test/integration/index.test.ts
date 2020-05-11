@@ -31,14 +31,14 @@ describe("Gverse", () => {
 
     it("mutates", async () => {
       const tx = conn.newTransaction(true)
-      await tx.mutate({ pet: { name: "Bigglesworth", type: type } })
+      await tx.mutate({ pet: { name: "Bigglesworth", "dgraph.type": type } })
     })
     it("queries", async () => {
       const tx = conn.newTransaction(true)
-      await tx.mutate({ pet: { name: "Biggles", type: type } })
+      await tx.mutate({ pet: { name: "Biggles", "dgraph.type": type } })
       const res = await conn
         .newTransaction()
-        .query(`{pets(func:eq(type,${type})) {name}}`)
+        .query(`{pets(func:type(${type})) {name}}`)
       expect(res.pets[0].name).toBe("Biggles")
     })
     it("language support", async () => {
@@ -49,30 +49,30 @@ describe("Gverse", () => {
       `)
       const tx = conn.newTransaction(true)
       await tx.mutate({
-        pet: { name: "Alpha", "name@ur": urduName, type: type }
+        pet: { name: "Alpha", "name@ur": urduName, "dgraph.type": type }
       })
       const res = await conn
         .newTransaction()
-        .query(`{pets(func:eq(type,${type})) {name name@ur}}`)
+        .query(`{pets(func:type(${type})) {name name@ur}}`)
       expect(res.pets[0].name).toBe("Alpha")
       expect(res.pets[0]["name@ur"]).toBe(urduName)
     })
     it("deletes", async () => {
       const tx = conn.newTransaction(true)
       const newUid = await tx.mutate({
-        pet: { name: "Bigglesworth", type: type }
+        pet: { name: "Bigglesworth", "dgraph.type": type }
       })
       expect(newUid).toBeDefined()
       await conn.newTransaction(true).delete({ uid: newUid })
       const res = await conn
         .newTransaction(true)
-        .query(`{ pets(func:uid(${newUid})) @filter(eq(type,${type})) {uid} }`)
+        .query(`{ pets(func:uid(${newUid})) @filter(type(${type})) {uid} }`)
       expect(res.pets).toEqual([])
     })
     it("retries conflicting transactions", async () => {
       const tx = conn.newTransaction(true)
       const uid = await tx.mutate({
-        pet: { name: "Transient", type: type }
+        pet: { name: "Transient", "dgraph.type": type }
       })
       await Promise.all([
         conn.newTransaction(true).mutate({ uid, name: "Name" }),
