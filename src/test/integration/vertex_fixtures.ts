@@ -101,8 +101,13 @@ export class VertexFixtures {
   private async clear() {
     await conn.clear(Pet.name)
     await conn.clear(Owner.name)
-    const indices =
-      "name: string @index(exact) @lang . \n" + "<origin>: uid @reverse . \n"
+    const indices = `
+      name: string @index(exact) @lang .
+      origin: [uid] @reverse .
+      breed: string .
+      owner: [uid] .
+      pets: [uid] .
+    `
     const types = `
       type Origin {
         name
@@ -110,6 +115,7 @@ export class VertexFixtures {
       }
       type Owner {
         name
+        pets
       }
       type Pet {
         name
