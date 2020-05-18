@@ -20,15 +20,17 @@ An OGM enables developers to work with their graph models through idiomatic obje
 - Support for transactions and batch updates
 - Before and after hooks for create, update and delete operations
 - Query options for ordering and pagination
+- Support for Dgraph 1.1 Types
 
 Roadmap:
 
 - Decorators for object-to-graph mapping (v1.1)
-- Support for Dgraph 1.1 Types
 
 ##### Compatibility with Dgraph
 
-Gverse supports Dgraph version 1.0.x. Work is underway for supporting the new [Type System in Dgraph 1.1](https://docs.dgraph.io/master/query-language/#type-system).
+Gverse supports Dgraph version 1.2.x. Work is underway for supporting the new [Features in Dgraph 20.03](https://dgraph.io/blog/post/dgraph-graphql-hits-ga/).
+
+For earlier versions of Dgraph, Gverse version 1.0.x can be used.
 
 ### Getting started
 

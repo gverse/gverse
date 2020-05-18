@@ -13,8 +13,6 @@ services:
 
   zero:
     image: dgraph/dgraph:v1.2.2
-    volumes:
-      - /tmp/data:/dgraph
     ports:
       - 5080:5080
       - 6080:6080
@@ -25,8 +23,6 @@ services:
 
   server:
     image: dgraph/dgraph:v1.2.2
-    volumes:
-      - /tmp/data:/dgraph
     ports:
       - 8080:8080
       - 9080:9080
