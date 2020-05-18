@@ -8,7 +8,7 @@ Gverse is an Object Graph Mapper (OGM) for the [Dgraph](dgraph.io), the high-per
 
 #### What's an OGM?
 
-An OGM enables developers to work with their graph models through idiomatic objects provided by their native programming language. It is similar in concept to Object-Relational Mapping (ORM) libraries such as [TypeORM](typeorm.io), [Sequelize](http://docs.sequelizejs.com/) or [Hibernate](https://hibernate.org/) but with some fundamental differences ([see below](#gverse-vs-traditional-orms)).
+An OGM enables developers to work with their graph models through idiomatic objects provided by their native programming language. It is similar in concept to Object-Relational Mapping (ORM) libraries such as [TypeORM](typeorm.io), [Sequelize](http://docs.sequelizejs.com/) or [Hibernate](https://hibernate.org/). [See Gverse vs ORMs](#gverse-vs-traditional-orms)).
 
 #### Features
 
@@ -20,17 +20,12 @@ An OGM enables developers to work with their graph models through idiomatic obje
 - Support for transactions and batch updates
 - Before and after hooks for create, update and delete operations
 - Query options for ordering and pagination
-- Support for Dgraph 1.1 Types
-
-Roadmap:
-
-- Decorators for object-to-graph mapping (v1.1)
 
 ##### Compatibility with Dgraph
 
-Gverse supports Dgraph version 1.2.x. Work is underway for supporting the new [Features in Dgraph 20.03](https://dgraph.io/blog/post/dgraph-graphql-hits-ga/).
+The current version of Gverse supports Dgraph version 1.2.x. 
 
-For earlier versions of Dgraph, Gverse version 1.0.x can be used.
+For compatibility with Dgraph 1.0.x, use Gverse version 1.0.2. You can specify the [version in your packages.json](https://60devs.com/npm-install-specific-version.html).
 
 ### Getting started
 
