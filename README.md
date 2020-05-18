@@ -61,6 +61,29 @@ const graph = new Gverse.Graph(
 )
 ```
 
+#### Defining the Dgraph-types for vertices
+
+```typescript
+    const indices = `
+      name: string @index(exact) @lang .
+      owner: [uid] .
+      repos: [uid] .
+      contributors: [uid] .      
+    `
+    const types = `
+      type User {
+        name
+        repositories
+      }
+      type Repository {
+        name
+        contributors
+        owner
+      }
+    `
+    await graph.applySchema(indices + types)
+```
+
 #### Define a vertex class
 
 ```typescript
