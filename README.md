@@ -23,7 +23,7 @@ An OGM enables developers to work with their graph models through idiomatic obje
 
 ##### Compatibility with Dgraph
 
-The current version of Gverse supports Dgraph version 1.2.x. 
+The current version of Gverse supports Dgraph version 1.2.x.
 
 For compatibility with Dgraph 1.0.x, use Gverse version 1.0.2. You can specify the [version in your packages.json](https://60devs.com/npm-install-specific-version.html).
 
@@ -64,13 +64,14 @@ const graph = new Gverse.Graph(
 #### Defining the Dgraph-types for vertices
 
 ```typescript
-    const indices = `
+const indices = `
       name: string @index(exact) @lang .
       owner: [uid] .
       repos: [uid] .
-      contributors: [uid] .      
+      contributors: [uid] .
+      repositories: [uid] .
     `
-    const types = `
+const types = `
       type User {
         name
         repositories
@@ -81,7 +82,7 @@ const graph = new Gverse.Graph(
         owner
       }
     `
-    await graph.applySchema(indices + types)
+await graph.applySchema(indices + types)
 ```
 
 #### Define a vertex class
