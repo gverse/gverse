@@ -12,13 +12,7 @@ services:
       - server
 
   zero:
-    image: dgraph/dgraph:v1.0.17
-    volumes:
-      - type: volume
-        source: dgraph
-        target: /dgraph
-        volume:
-          nocopy: true
+    image: dgraph/dgraph:v1.2.2
     ports:
       - 5080:5080
       - 6080:6080
@@ -28,13 +22,7 @@ services:
       driver: none
 
   server:
-    image: dgraph/dgraph:v1.0.17
-    volumes:
-      - type: volume
-        source: dgraph
-        target: /dgraph
-        volume:
-          nocopy: true
+    image: dgraph/dgraph:v1.2.2
     ports:
       - 8080:8080
       - 9080:9080
@@ -44,6 +32,3 @@ services:
       driver: none
     depends_on:
       - zero
-
-volumes:
-  dgraph:

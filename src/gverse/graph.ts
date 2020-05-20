@@ -13,10 +13,6 @@ export interface QueryOptions {
   offset?: number
 }
 
-/** Gverse using type to define vertex schema.
- * Future: Dgraph 1.1 supports intrinsic types. Gverse types will be migrated.
- */
-const DEFAULT_SCHEMA = "<type>: string @index(exact) ."
 const SchemaBuildTime = 100 // ms to wait after schema change
 
 /** Graph represents a connected graph and convenient features graph operations
@@ -25,11 +21,12 @@ const SchemaBuildTime = 100 // ms to wait after schema change
 export class Graph {
   constructor(private connection: Connection) {}
   indices: string = ""
+  types: string = ""
 
   /** Verifies that a connection can be made to the graph server */
   async connect(announce: boolean = false) {
     if (!this.connection.verified) await this.connection.connect(announce)
-    return await this.setIndices()
+    return await this.setIndicesAndTypes()
   }
 
   /** Connect to a given connection */
@@ -51,14 +48,15 @@ export class Graph {
     log("Warning: Schema was dropped - recreating.")
     if (type == undefined) {
       // schema was dropped, recreate
-      await this.setIndices()
+      await this.setIndicesAndTypes()
     }
   }
 
   /** Set up default Gverse schema and create all indices  */
-  async setIndices() {
+  async setIndicesAndTypes() {
     log("Setting indices", this.indices)
-    await this.connection.applySchema(DEFAULT_SCHEMA + "\n" + this.indices)
+    log("Setting types", this.types)
+    await this.connection.applySchema(this.indices + "\n" + this.types)
     return await waitPromise("set indices", SchemaBuildTime)
   }
 
@@ -73,9 +71,9 @@ export class Graph {
     if (!uid) throw Error("No uid provided")
     const tx = transaction || this.connection.newTransaction(true)
     const res = await tx.query(
-      `{vertex(func:uid(${uid})) @filter(has(type)) { ${Graph.expansion(
-        depth
-      )} }}`
+      `{vertex(func:type(${
+        vertexClass.name
+      })) @filter(uid(${uid})) { ${Graph.expansion(depth)} }}`
     )
     if (res && res.vertex) return new vertexClass().unmarshal(res.vertex.pop())
     return undefined
@@ -91,7 +89,7 @@ export class Graph {
     if (!uid) throw "No uid provided"
     const tx = transaction || this.connection.newTransaction(true)
     const res = await tx.query(
-      `{vertex(func:uid(${uid})) @filter(has(type)) { ${Graph.expansion(
+      `{vertex(func:uid(${uid})) @filter(has(dgraph.type)) { ${Graph.expansion(
         depth
       )} }}`
     )
@@ -110,9 +108,9 @@ export class Graph {
     if (!vertex.uid) throw "Vertex instance requires uid"
     const tx = transaction || this.connection.newTransaction(true)
     const res = await tx.query(
-      `{vertex(func:uid(${vertex.uid})) @filter(has(type)) { ${Graph.expansion(
-        depth
-      )} }}`
+      `{vertex(func:uid(${
+        vertex.uid
+      })) @filter(has(dgraph.type)) { ${Graph.expansion(depth)} }}`
     )
     if (res && res.vertex) return vertex.unmarshal(res.vertex.pop())
     else return undefined
@@ -160,7 +158,7 @@ export class Graph {
     log("Graph.queryWithFunction", vertexClass.name, queryFunction)
     return await this.query(
       vertexClass,
-      `{vertices(func:${queryFunction}) @filter(eq(type, ${
+      `{vertices(func:${queryFunction}) @filter(type( ${
         vertexClass.name
       })) { ${Graph.expansion(depth)} }}`,
       {},
@@ -183,7 +181,7 @@ export class Graph {
     log("Graph.all", vertexClass.name)
     return await this.queryWithFunction(
       vertexClass,
-      `eq(type,"${vertexClass.name}") ${orderPhrase} ${limitPhrase} ${offsetPhrase}`,
+      `type(${vertexClass.name}) ${orderPhrase} ${limitPhrase} ${offsetPhrase}`,
       transaction,
       depth
     )
@@ -217,6 +215,9 @@ export class Graph {
     await vertex.beforeCreate(vertex.marshal(traverse))
     // marshal again to get any updated values from beforeUpdate
     let values: any = vertex.marshal(traverse)
+    // Replacing type with dgraph.type
+    values["dgraph.type"] = values.type
+    delete values.type
     log("Graph.create after hook values:", values)
     const createdUid = await tx.mutate(values)
     if (createdUid) {
@@ -295,8 +296,8 @@ export class Graph {
     // remove special keys
     let vertexValues = Object.assign({}, values)
     Object.keys(values)
-      .filter(k => k.startsWith("_"))
-      .forEach(k => delete vertexValues[k])
+      .filter((k) => k.startsWith("_"))
+      .forEach((k) => delete vertexValues[k])
     return await tx.mutate(vertexValues)
   }
 

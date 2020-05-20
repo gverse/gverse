@@ -485,9 +485,9 @@ acorn-walk@^6.0.1:
   integrity sha512-7evsyfH1cLOCdAzZAd43Cic04yKydNx0cF+7tiA19p1XnLLPU4dpCQOqpjqwokFe//vS0QqfqqjCS2JkiIs0cA==
 
 acorn@^5.5.3:
-  version "5.7.4"
-  resolved "https://registry.yarnpkg.com/acorn/-/acorn-5.7.4.tgz#3e8d8a9947d0599a1796d10225d7432f4a4acf5e"
-  integrity sha512-1D++VG7BhrtvQpNbBzovKNc1FLGGEE/oGe7b9xJm/RFHMBeUaUGpluV9RLjZa47YFdPcDAenEYuq9pQPcMdLJg==
+  version "5.7.3"
+  resolved "https://registry.yarnpkg.com/acorn/-/acorn-5.7.3.tgz#67aa231bf8812974b85235a96771eb6bd07ea279"
+  integrity sha512-T/zvzYRfbVojPWahDsE5evJdHb3oJoQfFbsrKM7w5Zcs++Tr257tia3BmMP8XYVjp1S9RZXQMh7gao96BlqZOw==
 
 acorn@^6.0.1:
   version "6.2.1"
@@ -1114,12 +1114,12 @@ detect-newline@^2.1.0:
   resolved "https://registry.yarnpkg.com/detect-newline/-/detect-newline-2.1.0.tgz#f41f1c10be4b00e87b5f13da680759f2c5bfd3e2"
   integrity sha1-9B8cEL5LAOh7XxPaaAdZ8sW/0+I=
 
-dgraph-js@~1.3.1:
-  version "1.3.1"
-  resolved "https://registry.yarnpkg.com/dgraph-js/-/dgraph-js-1.3.1.tgz#2934f941cb62c0e62d03397d592ad4768c3d44dd"
-  integrity sha512-vKyIpeYSJliLbKklefA3u2DIKIyyHFadP3rqadyKQQTovo9YmqAsqIRsKVYeguZLQu5RuLVIC24ZoCw2mCLpgg==
+dgraph-js@^20.3.0:
+  version "20.3.0"
+  resolved "https://registry.yarnpkg.com/dgraph-js/-/dgraph-js-20.3.0.tgz#3e0a656f8607e1658c5e3d80bb26f7bce0eab765"
+  integrity sha512-OKCKLG469J5iZhJSgUdgIVPbDnKxs5vKLpd/819Q8jPL+syT+O4h4gQPEesO6fJ3tAqCL1AZjJKnBV8cWRe3Nw==
   dependencies:
-    google-protobuf "^3.5.0"
+    google-protobuf "^3.8.0"
     grpc "^1.21.1"
     is-base64 "^0.1.0"
 
@@ -1502,10 +1502,10 @@ globals@^11.1.0:
   resolved "https://registry.yarnpkg.com/globals/-/globals-11.12.0.tgz#ab8795338868a0babd8525758018c2a7eb95c42e"
   integrity sha512-WOBp/EEGUiIsJSp7wcv/y6MO+lV9UoncWqxuFfm8eBwzWNgyfBd6Gz+IeKQ9jCmyhoH99g15M3T+QaVHFjizVA==
 
-google-protobuf@^3.5.0:
-  version "3.9.1"
-  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.9.1.tgz#87e6a16b7fb16405b515a6c6622d5ace45578d86"
-  integrity sha512-tkz7SVwBktFbqFK3teXFUY/VM57+mbUgV9bSD+sZH1ocHJ7uk7BfEWMRdU24dd0ciUDokreA7ghH2fYFIczQdw==
+google-protobuf@^3.8.0:
+  version "3.11.4"
+  resolved "https://registry.yarnpkg.com/google-protobuf/-/google-protobuf-3.11.4.tgz#598ca405a3cfa917a2132994d008b5932ef42014"
+  integrity sha512-lL6b04rDirurUBOgsY2+LalI6Evq8eH5TcNzi7TYQ3BsIWelT0KSOQSBsXuavEkNf+odQU6c0lgz3UsZXeNX9Q==
 
 graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2:
   version "4.2.1"
