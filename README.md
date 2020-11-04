@@ -132,7 +132,7 @@ Edges can be directed or undirected (reversible), and can have a cardinality of 
 
 The `graph.newTransaction().upsert` method enables you to execute upsert block having a query and a mutation:
 
-```
+```typescript
 const query = `{vertex as var(func: eq(name,"John"))}`
 const values = {
   uid: "uid(vertex)",
@@ -143,7 +143,7 @@ await graph.newTransaction().upsert(query, values)
 
 An optional parameter `condition` can be used to run a conditional upsert:
 
-```
+```typescript
 const condition = `eq(len(vertex), 1)`
 await graph.newTransaction().upsert(query, values, condition)
 ```
