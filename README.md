@@ -128,6 +128,26 @@ class Repo {
 
 Edges can be directed or undirected (reversible), and can have a cardinality of one or many. For detailed examples, please see the integration tests under `./test/integration`.
 
+#### Running upsert (query with mutation)
+
+The `graph.newTransaction().upsert` method enables you to execute upsert block having a query and a mutation:
+
+```
+const query = `{vertex as var(func: eq(name,"John"))}`
+const values = {
+  uid: "uid(vertex)",
+  name: "Smith"
+}
+await graph.newTransaction().upsert(query, values)
+```
+
+An optional parameter `condition` can be used to run a conditional upsert:
+
+```
+const condition = `eq(len(vertex), 1)`
+await graph.newTransaction().upsert(query, values, condition)
+```
+
 ### Running Tests
 
 Test coverage for Gverse comes from integration tests. [Docker](https://docs.docker.com/install/) and [Docker-Compose](https://docs.docker.com/compose/install/) are required for running integration tests.

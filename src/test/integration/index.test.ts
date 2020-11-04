@@ -33,6 +33,33 @@ describe("Gverse", () => {
       const tx = conn.newTransaction(true)
       await tx.mutate({ pet: { name: "Bigglesworth", "dgraph.type": type } })
     })
+    it("runs simple upsert", async () => {
+      const tx = conn.newTransaction(true)
+      await tx.mutate({
+        pet: { name: "James Bigglesworth", "dgraph.type": type }
+      })
+
+      const query = `{vertex as var(func: type(${type})) }`
+      const values = {
+        uid: "uid(vertex)",
+        nickName: "Biggles"
+      }
+      await conn.newTransaction().upsert(query, values)
+    })
+    it("runs conditional upsert", async () => {
+      const tx = conn.newTransaction(true)
+      await tx.mutate({
+        pet: { name: "James Bigglesworth", "dgraph.type": type }
+      })
+
+      const query = `{vertex as var(func: type(${type})) }`
+      const values = {
+        uid: "uid(vertex)",
+        nickName: "Biggles"
+      }
+      const condition = `eq(len(vertex), 1)`
+      await conn.newTransaction().upsert(query, values, condition)
+    })
     it("queries", async () => {
       const tx = conn.newTransaction(true)
       await tx.mutate({ pet: { name: "Biggles", "dgraph.type": type } })
