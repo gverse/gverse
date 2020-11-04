@@ -35,4 +35,5 @@ jobs:
           name: Set up integration test environment
           command: |
             set -x
+            export COMPOSE_TLS_VERSION=TLSv1_2
             docker-compose -f src/test/integration/docker-compose.yml up --build --exit-code-from gverse --abort-on-container-exit
