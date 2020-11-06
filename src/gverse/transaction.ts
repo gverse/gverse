@@ -177,4 +177,46 @@ export class Transaction {
       }
     }
   }
+
+  /** Run upsert blocks in graph space */
+  async upsert(
+    query: string,
+    values: any,
+    condition?: string,
+    retries = 0
+  ): Promise<boolean> {
+    log(
+      `Transaction ${this.uuid} running upsert`,
+      query,
+      JSON.stringify(values),
+      condition || ""
+    )
+    try {
+      const mu = new dgraph.Mutation()
+      mu.setSetJson(values)
+      if (condition) mu.setCond(`@if(${condition})`)
+
+      const req = new dgraph.Request()
+      req.setQuery(`query ${query}`)
+      req.setMutationsList([mu])
+      req.setCommitNow(this.autoCommit)
+
+      await this.txn.doRequest(req)
+      return true
+    } catch (e) {
+      log(e)
+      try {
+        this.txn.discard()
+      } catch (e) {
+        log(e)
+      }
+      if (shouldRetry(e, retries)) {
+        this.txn = this.connection.client.newTxn()
+        await waitPromise(`upsert`)
+        return await this.upsert(query, values, condition, retries + 1)
+      } else {
+        throw Error(e)
+      }
+    }
+  }
 }
