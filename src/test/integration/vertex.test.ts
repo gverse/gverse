@@ -24,6 +24,8 @@ describe("Vertex", () => {
 
   beforeEach(async () => {
     await conn.clear(Pet.name)
+    await conn.clear(Owner.name)
+    await conn.clear(Origin.name)
     fixtures = await new VertexFixtures().build()
     pet = fixtures.pet || fail()
     owner = fixtures.owner || fail()
@@ -43,6 +45,32 @@ describe("Vertex", () => {
       expect(values.name).toBe("Tom")
       expect(values).not.toContain("graph")
       expect(values["name@ur"]).toBe("ٹوم")
+    })
+  })
+  describe("unmarshaling", () => {
+    beforeEach(async () => {
+      await graph.link(owner, pet, "pets")
+      await graph.link(pet, owner, "owner")
+    })
+    it("auto unmarshals one to many edge", async () => {
+      const owner = (await graph.first(Owner, {
+        predicate: "name",
+        value: "Austin"
+      })) as Owner
+      if (!owner.pets) fail("No pets found")
+      else {
+        expect(owner.pets[0]).toBeInstanceOf(Pet)
+      }
+    })
+    it("auto unmarshals one to one edge", async () => {
+      const pet = (await graph.first(Pet, {
+        predicate: "name",
+        value: "Biggles"
+      })) as Pet
+      if (!pet.owner) fail("No owner found")
+      else {
+        expect(pet.owner).toBeInstanceOf(Owner)
+      }
     })
   })
 

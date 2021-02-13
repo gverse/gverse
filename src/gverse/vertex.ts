@@ -113,7 +113,7 @@ export class Vertex {
   autoMarshal(traverse = true): any {
     let vertex: any = this
     let values: any = {}
-    Object.getOwnPropertyNames(vertex).forEach(key => {
+    Object.getOwnPropertyNames(vertex).forEach((key) => {
       let predicate: any = vertex[key]
       // ignore _* private instance variables and special variables
       if (!key.startsWith("_")) {
@@ -125,7 +125,7 @@ export class Vertex {
               log("Skipping reverse edge marshaling for", edge)
             } else {
               if (Array.isArray(predicate)) {
-                predicate = predicate.map(p => {
+                predicate = predicate.map((p) => {
                   return p.marshal()
                 })
               } else {
@@ -164,16 +164,19 @@ export class Vertex {
         let val: any = values[key]
         // assign edges as vertex object or array of vertex objects
         if (key in this._edges) {
+          const edge = this._edges[key] as Edge
           if (Array.isArray(val)) {
-            const edge = this._edges[key] as Edge
             if (edge.cardinality === Cardinality.Single) {
               const v = val.pop()
               val = new edge.type().unmarshal(v) as Vertex
             } else {
-              val = val.map(v => {
+              val = val.map((v) => {
                 return new edge.type().unmarshal(v) as Vertex
               })
             }
+          } else {
+            if (edge.cardinality === Cardinality.Single)
+              val = new edge.type().unmarshal(val) as Vertex
           }
         }
         vertex[key.replace("@", "$")] = val
