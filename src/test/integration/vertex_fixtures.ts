@@ -105,7 +105,7 @@ export class VertexFixtures {
       name: string @index(exact) @lang .
       origin: [uid] @reverse .
       breed: string .
-      owner: [uid] .
+      owner: uid .
       pets: [uid] .
     `
     const types = `
