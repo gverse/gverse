@@ -1,5 +1,5 @@
 import * as dgraph from "dgraph-js"
-import * as grpc from "grpc"
+import { grpc } from "dgraph-js"
 import chalk from "chalk"
 import log from "./debug-logger"
 import { Transaction } from "./transaction"
