@@ -8,7 +8,7 @@ Gverse is an Object Graph Mapper (OGM) for the [Dgraph](dgraph.io), the high-per
 
 #### What's an OGM?
 
-An OGM enables developers to work with their graph models through idiomatic objects provided by their native programming language. It is similar in concept to Object-Relational Mapping (ORM) libraries such as [TypeORM](typeorm.io), [Sequelize](http://docs.sequelizejs.com/) or [Hibernate](https://hibernate.org/). [See Gverse vs ORMs](#gverse-vs-traditional-orms)).
+An OGM enables developers to work with their graph models through idiomatic objects provided by their native programming language. It is similar in concept to Object-Relational Mapping (ORM) libraries such as [TypeORM](typeorm.io) or [Sequelize](http://docs.sequelizejs.com/). [See Gverse vs ORMs](#gverse-vs-traditional-orms)).
 
 #### Features
 
