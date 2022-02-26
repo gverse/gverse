@@ -1,5 +1,7 @@
 # Gverse
 
+Note: This project is looking for maintainers. If you're interested, please create an issue. 🙏
+
 #### Object Graph Mapper for Dgraph
 
 ![GitHub](https://img.shields.io/github/license/gverse/gverse) ![CircleCI](https://img.shields.io/circleci/build/github/gverse/gverse) ![npm type definitions](https://img.shields.io/npm/types/gverse) ![GitHub package.json version](https://img.shields.io/github/package-json/v/gverse/gverse)
