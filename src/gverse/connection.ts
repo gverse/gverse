@@ -23,8 +23,10 @@ export class Connection {
   stub: dgraph.DgraphClientStub
   client: dgraph.DgraphClient
   public verified: boolean = false
+  private environment: Environment
 
-  constructor(private environment: Environment) {
+  constructor(environment: Environment) {
+    this.environment = environment
     this.stub = new dgraph.DgraphClientStub(
       `${environment.host}:${environment.port}`,
       grpc.credentials.createInsecure()
@@ -84,15 +86,14 @@ export class Connection {
         const res = await this.query(
           `{vertices (func: type("${type}")) { uid }}`
         )
-        if (res && res.vertices)
-          await this.newTransaction(true).delete(res.vertices)
+        if (res?.vertices) await this.newTransaction(true).delete(res.vertices)
       } else {
         log("Clearing all vertices")
         const op = new dgraph.Operation()
         op.setDropAll(true)
         await this.client.alter(op)
       }
-    } catch (e) {
+    } catch (e: any) {
       log("Failed to clear:", e)
       throw Error(e)
     }
@@ -104,18 +105,17 @@ export class Connection {
       const op = new dgraph.Operation()
       op.setSchema(schema)
       await this.client.alter(op)
-    } catch (e) {
+    } catch (e: any) {
       if (shouldRetry(e, retries)) {
         await waitPromise(`schema ${schema}`)
         return await this.applySchema(schema, retries + 1)
-      } else {
-        log(e)
-        throw Error(e)
       }
+      log(e)
+      throw Error(e)
     }
   }
   async disconnect() {
     log("Disconnecting from dgraph")
-    await this.stub.close()
+    this.stub.close()
   }
 }

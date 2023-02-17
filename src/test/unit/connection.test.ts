@@ -3,7 +3,7 @@ import Gverse from "../../gverse"
 describe("Connection", () => {
   it("connects", async () => {
     Gverse.Transaction.prototype.query = jest.fn(
-      (string: string, variables: any): Promise<any> => Promise.resolve()
+      async (string: string, variables: any): Promise<any> => Promise.resolve()
     )
     const conn = new Gverse.Connection({
       host: "localhost",
