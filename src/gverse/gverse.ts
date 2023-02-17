@@ -53,7 +53,7 @@ namespace Gverse {
   export import Direction = _Direction
 
   // --- Interfaces ---
-  export interface Environment extends _Environment {}
+  export type Environment = _Environment
 }
 
 export default Gverse

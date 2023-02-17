@@ -111,8 +111,9 @@ export class Vertex {
    * @param traverse whether or not do marshal linked edges
    */
   autoMarshal(traverse = true): any {
-    let vertex: any = this
-    let values: any = {}
+    // eslint-disable-next-line
+    const vertex: any = this
+    const values: any = {}
     Object.getOwnPropertyNames(vertex).forEach((key) => {
       let predicate: any = vertex[key]
       // ignore _* private instance variables and special variables
@@ -145,20 +146,21 @@ export class Vertex {
   /** Unmarshal through introspection */
   autoUnmarshal(vertex: any, values: any): any {
     // reset all edges
-    for (let key in this._edges) {
+    for (const key in this._edges) {
       vertex[key] = undefined
     }
     // apply reverse edges
-    for (let key in this._edges) {
+    for (const key in this._edges) {
       const edge = this._edges[key]
       if (edge.direction == Direction.Undirected) {
         values[key] = values[`~${edge.reverseEdgeName}`]
+        // eslint-disable-next-line
         delete values[`~${edge.reverseEdgeName}`]
       }
     }
 
     // assign all values to the vertex
-    for (let key in values) {
+    for (const key in values) {
       if (!key.startsWith("_")) {
         // skip special keys
         let val: any = values[key]
