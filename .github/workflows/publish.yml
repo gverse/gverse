@@ -32,3 +32,4 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Publish to npm
         run: yarn publish
+
