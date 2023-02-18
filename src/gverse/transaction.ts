@@ -1,24 +1,28 @@
 import * as dgraph from "dgraph-js"
 import { Connection } from "./connection"
 import log from "./debug-logger"
-import uuidv4 from "uuid/v4"
+import { v4 } from "uuid"
 import { waitPromise, shouldRetry } from "./retry"
 
 /** Represents a dgraph transaction that can be created on demand or explicitly. */
 export class Transaction {
   private txn: dgraph.Txn
-  private uuid: string = uuidv4()
+  private uuid: string = v4()
+  private connection: Connection
+  private autoCommit: boolean
   constructor(
-    readonly connection: Connection,
-    readonly autoCommit: boolean,
+    connection: Connection,
+    autoCommit: boolean,
     verifyConnection = false,
-    private readOnly: boolean = false
+    readOnly: boolean = false
   ) {
-    if (verifyConnection && (!connection || !connection.verified)) {
+    if (verifyConnection && !connection?.verified) {
       const issue = "Can not create transaction. No verified connection."
       log(issue)
       throw Error(issue)
     }
+    this.connection = connection
+    this.autoCommit = autoCommit
     this.txn = connection.client.newTxn({ readOnly })
   }
 
@@ -48,21 +52,20 @@ export class Transaction {
         : await this.txn.query(query)
       log("Query response:", res.getJson())
       return res.getJson()
-    } catch (e) {
+    } catch (e: any) {
       log(e)
       try {
-        this.txn.discard()
-      } catch (e) {
+        void this.txn.discard()
+      } catch (e: any) {
         log(e)
       }
       if (shouldRetry(e, retries)) {
         this.txn = this.connection.client.newTxn({ readOnly: true })
         await waitPromise(`query ${query}`)
         return await this.query(query, variables, retries + 1)
-      } else {
-        log("Failed to query:", query, "; error:", e)
-        throw Error(e)
       }
+      log("Failed to query:", query, "; error:", e)
+      throw Error(e)
     }
   }
 
@@ -77,26 +80,25 @@ export class Transaction {
       mu.setCommitNow(this.autoCommit)
       mu.setSetJson(values)
       const uidMap = await this.txn.mutate(mu)
-      const updatedUid = uidMap.getUidsMap().get("createdUid") || values.uid
+      const updatedUid = uidMap.getUidsMap().get("createdUid") ?? values.uid
       if (!updatedUid) {
         return values.uid
       }
       log(`Transaction ${this.uuid} mutated with new uid`, updatedUid)
       return updatedUid
-    } catch (e) {
+    } catch (e: any) {
       log(e)
       try {
-        this.txn.discard()
-      } catch (e) {
+        void this.txn.discard()
+      } catch (e: any) {
         log(e)
       }
       if (shouldRetry(e, retries)) {
         this.txn = this.connection.client.newTxn()
         await waitPromise(`mutate ${JSON.stringify(values)}`)
         return await this.mutate(values, retries + 1)
-      } else {
-        throw Error(e)
       }
+      throw Error(e)
     }
   }
 
@@ -115,9 +117,9 @@ export class Transaction {
       mu.setSetNquads(nquad)
       const assigned = await this.txn.mutate(mu)
       return assigned.getUidsMap().get("blank-0")
-    } catch (e) {
+    } catch (e: any) {
       log(`Transaction ${this.uuid} mutating failed`, nquad, e)
-      this.txn.discard()
+      void this.txn.discard()
       throw Error(e)
     }
   }
@@ -137,9 +139,9 @@ export class Transaction {
       mu.setDelNquads(nquad)
       const assigned = await this.txn.mutate(mu)
       return assigned.getUidsMap().get("blank-0")
-    } catch (e) {
+    } catch (e: any) {
       log(`Transaction ${this.uuid} delete nquad failed`, nquad, e)
-      this.txn.discard()
+      void this.txn.discard()
       throw Error(e)
     }
   }
@@ -160,21 +162,20 @@ export class Transaction {
       const uid = await this.txn.mutate(mu)
       log(`Transaction ${this.uuid} deleted`, uid)
       return uid.getUidsMap().get("blank-0")
-    } catch (e) {
+    } catch (e: any) {
       log(`Transaction ${this.uuid} delete failed`, values, e)
       try {
-        this.txn.discard()
-      } catch (e) {
+        void this.txn.discard()
+      } catch (e: any) {
         log(e)
       }
       if (shouldRetry(e, retries)) {
         this.txn = this.connection.client.newTxn()
         await waitPromise(`delete ${JSON.stringify(values)}`)
         return await this.query(values, retries + 1)
-      } else {
-        log("Failed to delete:", values, "; error:", e)
-        throw Error(e)
       }
+      log("Failed to delete:", values, "; error:", e)
+      throw Error(e)
     }
   }
 
@@ -189,7 +190,7 @@ export class Transaction {
       `Transaction ${this.uuid} running upsert`,
       query,
       JSON.stringify(values),
-      condition || ""
+      condition ?? ""
     )
     try {
       const mu = new dgraph.Mutation()
@@ -203,20 +204,19 @@ export class Transaction {
 
       await this.txn.doRequest(req)
       return true
-    } catch (e) {
+    } catch (e: any) {
       log(e)
       try {
-        this.txn.discard()
-      } catch (e) {
+        void this.txn.discard()
+      } catch (e: any) {
         log(e)
       }
       if (shouldRetry(e, retries)) {
         this.txn = this.connection.client.newTxn()
         await waitPromise(`upsert`)
         return await this.upsert(query, values, condition, retries + 1)
-      } else {
-        throw Error(e)
       }
+      throw Error(e)
     }
   }
 }

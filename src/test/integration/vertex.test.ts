@@ -27,9 +27,9 @@ describe("Vertex", () => {
     await conn.clear(Owner.name)
     await conn.clear(Origin.name)
     fixtures = await new VertexFixtures().build()
-    pet = fixtures.pet || fail()
-    owner = fixtures.owner || fail()
-    origin = fixtures.origin || fail()
+    pet = fixtures.pet ?? fail()
+    owner = fixtures.owner ?? fail()
+    origin = fixtures.origin ?? fail()
   })
 
   it("has uid", async () => {
@@ -77,13 +77,13 @@ describe("Vertex", () => {
   describe("querying", () => {
     it("gets all", async () => {
       const pets = (await graph.all(
-        (Pet as any) as typeof Gverse.Vertex
-      )) as Array<Pet>
+        Pet as any as typeof Gverse.Vertex
+      )) as Pet[]
       const names = pets.map((p: Pet) => p.name)
       expect(names).toEqual(["Biggles"])
     })
     it("gets first", async () => {
-      const pet = (await graph.first((Pet as any) as typeof Gverse.Vertex, {
+      const pet = (await graph.first(Pet as any as typeof Gverse.Vertex, {
         predicate: "name",
         value: "Biggles"
       })) as Pet
@@ -98,8 +98,7 @@ describe("Vertex", () => {
       if (!pet.uid) fail("No uid")
       else {
         await graph.set(pet.uid, { breed: newBreed })
-        // @ts-ignore
-        let updatedPet = (await graph.get(Pet, pet.uid)) as Pet
+        const updatedPet = (await graph.get(Pet, pet.uid)) as Pet
         expect(updatedPet.breed).toBe(newBreed)
       }
     })
@@ -111,7 +110,7 @@ describe("Vertex", () => {
       else {
         pet.breed = newBreed
         await pet.saveInto(graph)
-        let updatedPet = (await graph.get(Pet, pet.uid)) as Pet
+        const updatedPet = (await graph.get(Pet, pet.uid)) as Pet
         expect(updatedPet.breed).toBe(newBreed)
       }
     })
@@ -185,7 +184,7 @@ describe("Vertex", () => {
     it("calls before and after delete", async () => {
       expect(pet.beforeDeleteSet).toBe(false)
       expect(pet.afterDeleteSet).toBe(false)
-      let deletedPet = await pet.deleteFrom(graph)
+      const deletedPet = await pet.deleteFrom(graph)
       expect(deletedPet).toBeDefined()
       expect(pet.beforeDeleteSet).toBe(true)
       expect(pet.afterDeleteSet).toBe(true)

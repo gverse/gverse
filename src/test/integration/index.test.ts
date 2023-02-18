@@ -114,8 +114,8 @@ describe("Gverse", () => {
       expect(Gverse.Graph.expansion(2)).toEqual(
         "uid expand(_all_) { uid expand(_all_) }"
       )
-      expect(() => Gverse.Graph.expansion(0)).toThrow()
-      expect(() => Gverse.Graph.expansion(11)).toThrow()
+      expect(() => Gverse.Graph.expansion(0)).toThrowError()
+      expect(() => Gverse.Graph.expansion(11)).toThrowError()
     })
   })
 })

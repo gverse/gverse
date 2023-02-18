@@ -10,13 +10,13 @@ export function shouldRetry(error: Error, retries: number): boolean {
 }
 
 /** Returns an promise with timeout. Used for retries. */
-export function waitPromise(
+export async function waitPromise(
   purpose = "unknown",
   time: number = 15
 ): Promise<void> {
   log("Waiting for", time, "ms", "for", purpose)
   return new Promise(
-    (resolve: (value?: void | PromiseLike<void>) => void): void => {
+    (resolve: (value?: PromiseLike<void> | void) => void): void => {
       const id = setTimeout(() => {
         clearTimeout(id)
         resolve()

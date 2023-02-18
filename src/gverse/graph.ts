@@ -19,7 +19,10 @@ const SchemaBuildTime = 100 // ms to wait after schema change
  * with vertices and edges.
  */
 export class Graph {
-  constructor(private connection: Connection) {}
+  private connection: Connection
+  constructor(connection: Connection) {
+    this.connection = connection
+  }
   indices: string = ""
   types: string = ""
 
@@ -32,7 +35,7 @@ export class Graph {
   /** Connect to a given connection */
   async connectTo(connection: Connection, announce: boolean = false) {
     this.connection = connection
-    this.connect(announce)
+    void this.connect(announce)
   }
 
   /** Get a new transaction on the current connection.
@@ -69,13 +72,13 @@ export class Graph {
   ): Promise<Vertex | undefined> {
     log("Graph.get", vertexClass.name, uid)
     if (!uid) throw Error("No uid provided")
-    const tx = transaction || this.connection.newTransaction(true)
+    const tx = transaction ?? this.connection.newTransaction(true)
     const res = await tx.query(
       `{vertex(func:type(${
         vertexClass.name
       })) @filter(uid(${uid})) { ${Graph.expansion(depth)} }}`
     )
-    if (res && res.vertex) return new vertexClass().unmarshal(res.vertex.pop())
+    if (res?.vertex) return new vertexClass().unmarshal(res.vertex.pop())
     return undefined
   }
 
@@ -86,15 +89,15 @@ export class Graph {
     depth: number = 3
   ): Promise<any> {
     log("Graph.uid", uid)
-    if (!uid) throw "No uid provided"
-    const tx = transaction || this.connection.newTransaction(true)
+    if (!uid) throw new Error("No uid provided")
+    const tx = transaction ?? this.connection.newTransaction(true)
     const res = await tx.query(
       `{vertex(func:uid(${uid})) @filter(has(dgraph.type)) { ${Graph.expansion(
         depth
       )} }}`
     )
-    if (res && res.vertex) return res.vertex.pop()
-    else return undefined
+    if (res?.vertex) return res.vertex.pop()
+    return undefined
   }
 
   /** Load a vertex from the graph with *all* predicates for given uid for
@@ -105,15 +108,15 @@ export class Graph {
     transaction?: Transaction
   ): Promise<Vertex | undefined> {
     log("Graph.load", vertex.type, `(${vertex.uid})`)
-    if (!vertex.uid) throw "Vertex instance requires uid"
-    const tx = transaction || this.connection.newTransaction(true)
+    if (!vertex.uid) throw new Error("Vertex instance requires uid")
+    const tx = transaction ?? this.connection.newTransaction(true)
     const res = await tx.query(
       `{vertex(func:uid(${
         vertex.uid
       })) @filter(has(dgraph.type)) { ${Graph.expansion(depth)} }}`
     )
-    if (res && res.vertex) return vertex.unmarshal(res.vertex.pop())
-    else return undefined
+    if (res?.vertex) return vertex.unmarshal(res.vertex.pop())
+    return undefined
   }
 
   /** Query and unmarshal matching vertices using full GraphQL± query.
@@ -130,7 +133,7 @@ export class Graph {
     depth: number = 3
   ): Promise<Vertex[] | undefined> {
     log("Graph.query", vertexClass.name, query)
-    const tx = transaction || this.connection.newTransaction(true)
+    const tx = transaction ?? this.connection.newTransaction(true)
     const res = await tx.query(query, parameters)
     if (!res) return []
     const vertices: Vertex[] = res.vertices.map((values: any) => {
@@ -170,14 +173,14 @@ export class Graph {
   /** Query and unmarshal matching vertices */
   async all(
     vertexClass: typeof Vertex,
-    { order, limit, offset }: QueryOptions = {},
+    { order, limit = 1000, offset }: QueryOptions = {},
     transaction?: Transaction,
     depth: number = 3
   ): Promise<Vertex[] | undefined> {
-    limit = (limit && limit < 10000 && limit) || 1000
-    const orderPhrase = (order && `, ${order}`) || ""
+    limit = limit < 10000 ? limit : 1000
+    const orderPhrase = (order && `, ${order}`) ?? ""
     const limitPhrase = `, first:${limit}`
-    const offsetPhrase = (offset && `, offset:${offset}`) || ""
+    const offsetPhrase = (offset && `, offset:${offset}`) ?? ""
     log("Graph.all", vertexClass.name)
     return await this.queryWithFunction(
       vertexClass,
@@ -211,10 +214,10 @@ export class Graph {
     transaction?: Transaction
   ): Promise<Vertex | undefined> {
     log("Graph.create", vertex)
-    const tx = transaction || this.connection.newTransaction(true)
+    const tx = transaction ?? this.connection.newTransaction(true)
     await vertex.beforeCreate(vertex.marshal(traverse))
     // marshal again to get any updated values from beforeUpdate
-    let values: any = vertex.marshal(traverse)
+    const values: any = vertex.marshal(traverse)
     // Replacing type with dgraph.type
     values["dgraph.type"] = values.type
     delete values.type
@@ -234,9 +237,9 @@ export class Graph {
     transaction?: Transaction
   ): Promise<boolean> {
     log("Graph.delete", vertex)
-    if (!vertex.uid) throw "Can not delete a vertex without a uid"
-    const tx = transaction || this.connection.newTransaction(true)
-    let values: any = vertex.marshal(traverse)
+    if (!vertex.uid) throw new Error("Can not delete a vertex without a uid")
+    const tx = transaction ?? this.connection.newTransaction(true)
+    const values: any = vertex.marshal(traverse)
     await vertex.beforeDelete(values)
     const delMut = { uid: vertex.uid }
     const res = await tx.delete(delMut)
@@ -252,13 +255,13 @@ export class Graph {
     transaction?: Transaction
   ): Promise<Vertex | undefined> {
     log("Graph.save", vertex)
-    if (!vertex.uid) throw "Can not save a vertex without a uid"
-    const tx = transaction || this.connection.newTransaction(true)
+    if (!vertex.uid) throw new Error("Can not save a vertex without a uid")
+    const tx = transaction ?? this.connection.newTransaction(true)
     const currentValues = await this.uid(vertex.uid, tx, traverse ? 3 : 1)
     await vertex.beforeUpdate(currentValues, vertex.marshal(traverse))
 
     // marshal again to get any updated values from beforeUpdate
-    let values: any = vertex.marshal(traverse)
+    const values: any = vertex.marshal(traverse)
     const updated = await tx.mutate(values)
 
     if (updated) await vertex.afterUpdate(currentValues, values)
@@ -271,8 +274,8 @@ export class Graph {
     traverse: boolean = false,
     transaction?: Transaction
   ): Promise<Vertex | undefined> {
-    if (!vertex.uid) throw "Can not save a vertex without a uid"
-    const tx = transaction || this.connection.newTransaction(true)
+    if (!vertex.uid) throw new Error("Can not save a vertex without a uid")
+    const tx = transaction ?? this.connection.newTransaction(true)
     const values = vertex.marshal(traverse)
     await tx.mutate(values)
     return vertex
@@ -291,13 +294,15 @@ export class Graph {
     transaction?: Transaction
   ): Promise<string | undefined> {
     log("Graph.set", uid, values)
-    const tx = transaction || this.connection.newTransaction(true)
+    const tx = transaction ?? this.connection.newTransaction(true)
     values.uid = uid // flatten it for dgraph
     // remove special keys
-    let vertexValues = Object.assign({}, values)
+    const vertexValues = Object.assign({}, values)
+    /* eslint-disable @typescript-eslint/no-dynamic-delete */
     Object.keys(values)
       .filter((k) => k.startsWith("_"))
       .forEach((k) => delete vertexValues[k])
+    /* eslint-disable @typescript-eslint/no-dynamic-delete */
     return await tx.mutate(vertexValues)
   }
 
@@ -309,7 +314,7 @@ export class Graph {
     transaction?: Transaction
   ): Promise<string | undefined> {
     if (from.uid && to.uid) {
-      const tx = transaction || this.connection.newTransaction(true)
+      const tx = transaction ?? this.connection.newTransaction(true)
       return await tx.mutateNquads(`<${from.uid}>`, predicate, `<${to.uid}>`)
     }
   }
@@ -322,7 +327,7 @@ export class Graph {
     transaction?: Transaction
   ): Promise<string | undefined> {
     if (from.uid && to.uid) {
-      const tx = transaction || this.connection.newTransaction(true)
+      const tx = transaction ?? this.connection.newTransaction(true)
       return await tx.deleteNquads(`<${from.uid}>`, predicate, `<${to.uid}>`)
     }
   }
@@ -335,16 +340,16 @@ export class Graph {
   /** Returns the JSON expansion phrase for nested vertices */
   static expansion(depth: number) {
     if (depth < 1 || depth > 10)
-      throw "Invalid depth. Should be between 1 and 10."
+      throw new Error("Invalid depth. Should be between 1 and 10.")
     return Graph.Depths[depth]
   }
 
   /** Create an array of expansion phrases */
-  static Depths: Array<string> = (() => {
+  static Depths: string[] = (() => {
     const nest = (s: string): string => `uid expand(_all_) { ${s} }`
     let expression = "uid expand(_all_)"
-    let depths = []
-    for (var i = 1; i < 11; i++) {
+    const depths = []
+    for (let i = 1; i < 11; i++) {
       depths[i] = expression
       expression = nest(expression)
     }
