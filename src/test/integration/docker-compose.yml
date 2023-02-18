@@ -12,7 +12,7 @@ services:
       - server
 
   zero:
-    image: dgraph/dgraph:v1.2.2
+    image: dgraph/dgraph:v22.0.2
     ports:
       - 5080:5080
       - 6080:6080
@@ -22,12 +22,12 @@ services:
       driver: none
 
   server:
-    image: dgraph/dgraph:v1.2.2
+    image: dgraph/dgraph:v22.0.2
     ports:
       - 8080:8080
       - 9080:9080
     restart: on-failure
-    command: dgraph alpha --my=server:7080 --lru_mb=2048 --zero=zero:5080
+    command: dgraph alpha --my=server:7080 --cache size-mb=2048 --zero=zero:5080 --security "whitelist=0.0.0.0/0"
     logging:
       driver: none
     depends_on:
