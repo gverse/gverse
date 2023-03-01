@@ -180,7 +180,7 @@ export class Graph {
     limit = limit < 10000 ? limit : 1000
     const orderPhrase = (order && `, ${order}`) ?? ""
     const limitPhrase = `, first:${limit}`
-    const offsetPhrase = (offset && `, offset:${offset}`) ?? ""
+    const offsetPhrase = offset ? `, offset:${offset}` : ""
     log("Graph.all", vertexClass.name)
     return await this.queryWithFunction(
       vertexClass,
